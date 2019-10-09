@@ -1,5 +1,6 @@
 from typing import Union, Optional
 from numpy import array, ndarray
+import numpy
 
 from Normalizer.Models.ImageModels import TaggedImage, TrainingImage
 
@@ -77,7 +78,7 @@ class TensorBuilder:
                 print(f'{self.__class__.__name__}: [{i}/{img_list_len}]')
             i += 1
 
-        tensor_arr = array(tensor_list)
+        tensor_arr = array(tensor_list, dtype=numpy.uint8)
 
         # Reshape the tensor to (samples, width, height, channels) explicitly.
         # When grayscale == True it's (samples, width, height)

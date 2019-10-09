@@ -17,8 +17,8 @@ from Normalizer.Models.NetworkModels import UNetModel, SimpleDenseModel
 # However for the first time or if you change data you can reload images using the flag below.
 reload_images = False
 
-training_data_dir = '/home/pawel/PracaInzynierska/TrainingData_Augmented'
-tagged_data_dir = '/home/pawel/PracaInzynierska/LiterkiTagged_Augmented'
+training_data_dir = '/home/pawel/PracaInzynierska/TrainingData_NewBG'
+tagged_data_dir = '/home/pawel/PracaInzynierska/LiterkiTagged_NewBG'
 
 resources_dir = '/home/pawel/PracaInzynierska/Normalizer'
 
@@ -29,9 +29,9 @@ models_dir = resources_dir + '/Models'
 # If you want to use an existing model to plot graphs, predict or analize data set this to false and fill below paths
 retrain_model = True
 
-model_class = SimpleDenseModel
-model_path = models_dir + '/bf0ca_UNetModel_e015'
-history_path = models_dir + '/bf0ca_UNetModel_history.p'
+model_class = UNetModel
+model_path = models_dir + '/f2051_UNetModel_e003'
+history_path = models_dir + '/f2051_UNetModel_history.p'
 
 if __name__ == "__main__":
 
@@ -45,21 +45,20 @@ if __name__ == "__main__":
 
     if reload_images:
 
-        org_aug = DirectoryImageProvider(training_data_dir, TrainingImage)
-        tgg_aug = DirectoryImageProvider(tagged_data_dir, TaggedImage)
-
-        tgg_aug.resolution(16)
-
         seed = 69
-        org_aug.shuffle(seed=seed)
-        tgg_aug.shuffle(seed=seed)
 
+        org_aug = DirectoryImageProvider(training_data_dir, TrainingImage)
+        org_aug.shuffle(seed=seed)
         org_tsr = TensorBuilder(org_aug.all, shape=(in_res, in_res), grayscale=True).build().type('float32').range(0, 1)
+
+        with open(training_data_tensor, 'wb') as training_file:
+            dump(org_tsr, training_file)
+
+        tgg_aug = DirectoryImageProvider(tagged_data_dir, TaggedImage)
+        tgg_aug.shuffle(seed=seed)
         tgg_tsr = TensorBuilder(tgg_aug.all, shape=(out_res, out_res), grayscale=True).build().type('float32').range(0, 1)
 
-        with open(training_data_tensor, 'wb') as training_file, open(tagged_data_tensor, 'wb') as tagged_file:
-
-            dump(org_tsr, training_file)
+        with open(tagged_data_tensor, 'wb') as tagged_file:
             dump(tgg_tsr, tagged_file)
 
     else:
@@ -102,13 +101,13 @@ if __name__ == "__main__":
 
         model = model_class().build_model((in_res, in_res, 1), (out_res, out_res, 1))
         model.compile(
-            optimizer=Adam(5e-5),
+            optimizer=Adam(1e-4),
             loss='binary_crossentropy',
             metrics=['accuracy'])
 
         model.summary()
 
-        epochs_num = 15
+        epochs_num = 3
         batch_size = 32
         save_every_n_epoch = 1  # How often the fit function will save the model to the models directory
 
@@ -134,4 +133,3 @@ if __name__ == "__main__":
         model = keras.models.load_model(model_path)
         with open(history_path, 'rb'):
             history = load(history_path)
-

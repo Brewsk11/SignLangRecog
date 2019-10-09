@@ -133,7 +133,7 @@ class TaggedImage(ImageAbstr):
 
         self._resolution: int
 
-        self._filename_pattern = "^[A-Zdns][0-9]{1,5}_[0-9]{1,3}\.(bmp|jpg)$"
+        self._filename_pattern = "^[A-Zdns][0-9]{1,6}_[0-9]{1,3}\.(bmp|jpg)$"
         super().__init__(filepath, self._filename_pattern)
 
         self._resolution = int(self.filename.rsplit('_', 1)[1].split('.')[0])
@@ -154,5 +154,5 @@ class TrainingImage(ImageAbstr):
     """
 
     def __init__(self, filepath: str):
-        self._filename_pattern = "^[A-Zdns][0-9]{1,5}\.(bmp|jpg)$"
+        self._filename_pattern = "^[A-Zdns][0-9]{1,6}\.(bmp|jpg)$"
         super().__init__(filepath, self._filename_pattern)
