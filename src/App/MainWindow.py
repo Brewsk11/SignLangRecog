@@ -1,11 +1,13 @@
 import tkinter as tk
-
+from  App.Modules.DetectorAdapter import DetectorAdapterMockup
 
 class MainWindow(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.init_layout()
+
+        self.detector = DetectorAdapterMockup(self.on_new_frame, self.on_hand_detected)
 
     def init_layout(self):
         unit_size = 29
@@ -36,21 +38,21 @@ class MainWindow(tk.Tk):
         predicted_text['font'] = ('Ubuntu Mono', '32')
 
         # 2nd row
-        video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
-                                  row=1, column=0, rowspan=2)
+        self.video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
+                                       row=1, column=0, rowspan=2)
 
-        hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
-                                 row=1, column=1)
+        self.hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
+                                      row=1, column=1)
 
-        normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
-                                       row=2, column=1)
+        self.normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
+                                            row=2, column=1)
 
-        prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
-                                       row=1, column=2, rowspan=2)
+        self.prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
+                                            row=1, column=2, rowspan=2)
 
         # 3rd row
-        application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
-                                        row=3, column=0, columnspan=3)
+        self.application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
+                                             row=3, column=0, columnspan=3)
 
     def load_new_frame(self, frame):
         # TODO: Mateusz
@@ -66,15 +68,21 @@ class MainWindow(tk.Tk):
         # Prefferably na osobnym wątku
 
         if True:  # If hand_detected:
-            self.on_hand_detected(hand_img)
+            pass
+            # self.on_hand_detected(hand_img)
 
     def on_hand_detected(self, hand_img):
         # TODO: Pawel
         # Wczytaj zdjecie reki z HAND VIEW, wykonaj predict() na modelu Normalizatora i wyślij do NORMALIZED VIEW
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
 
+        img = tk.PhotoImage(hand_img, master=self.hand_view_f)
+        # img.pack()
+        print("Works!")
+
         if True:  # If success:
-            self.on_hand_normalized(hand_norm)
+            # self.on_hand_normalized(hand_norm)
+            pass
 
     def on_hand_normalized(self, hand_norm):
         # TODO: Kuba
@@ -82,7 +90,8 @@ class MainWindow(tk.Tk):
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
 
         if True:  # If success:
-            self.on_letter_classified(pred_list)
+            # self.on_letter_classified(pred_list)
+            pass
 
     def on_letter_classified(self, pred_list):
         # TODO: Kuba
