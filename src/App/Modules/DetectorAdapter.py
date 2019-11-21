@@ -35,9 +35,7 @@ class DetectorAdapterMockup(DetectorAdapter):
 
         while True:
             sleep(2)
-
             index = random.randint(0, len(self.mock_images) - 1)
-            print(index)
 
             message = (
                 "hand_detected",

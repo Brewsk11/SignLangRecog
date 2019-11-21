@@ -17,3 +17,6 @@ if __name__ == "__main__":
 
             if message == "hand_detected":
                 app.on_hand_detected(payload)
+
+            elif message == "hand_normalized":
+                app.on_hand_normalized(payload)

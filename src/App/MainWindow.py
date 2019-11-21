@@ -1,6 +1,8 @@
 import tkinter as tk
-from PIL import ImageTk
+import numpy as np
+from PIL import ImageTk, Image
 from App.Modules.DetectorAdapter import DetectorAdapterMockup
+from App.Modules.NormalizerAdapter import NormalizerAdapter
 import matplotlib.pyplot as plt
 
 class MainWindow(tk.Tk):
@@ -10,7 +12,7 @@ class MainWindow(tk.Tk):
         self.init_layout()
 
         self.detector = DetectorAdapterMockup(message_queue)
-
+        self.normalizer = NormalizerAdapter(message_queue)
 
     def init_layout(self):
         unit_size = 29
@@ -47,12 +49,16 @@ class MainWindow(tk.Tk):
         hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
                                       row=1, column=1)
 
-        self.image_label = tk.Label(hand_view_f)
-        self.image_label['background'] = 'red'
-        self.image_label.pack()
+        self.hand_view = tk.Label(hand_view_f)
+        self.hand_view['background'] = 'red'
+        self.hand_view.pack()
 
         normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
                                             row=2, column=1)
+
+        self.normalized_view = tk.Label(normalized_view_f)
+        self.normalized_view['background'] = 'blue'
+        self.normalized_view.pack()
 
         prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                             row=1, column=2, rowspan=2)
@@ -84,18 +90,26 @@ class MainWindow(tk.Tk):
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
 
         img = ImageTk.PhotoImage(hand_img)
-        self.image_label.configure(image=img)
-        self.image_label.image = img
+        self.hand_view.configure(image=img)
+        self.hand_view.image = img
 
         print("on_hand_detected called")
-        if True:  # If success:
-            # self.on_hand_normalized(hand_norm)
-            pass
 
-    def on_hand_normalized(self, hand_norm):
+        self.normalizer.normalize(hand_img)
+
+    def on_hand_normalized(self, hand_norm: np.array):
         # TODO: Kuba
         # Wczytaj kontur z NORMALIZED VIEW, wykonaj predict() na modelu Klasyfikatora
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
+
+        # Rescale the array to 0-255
+        hand_norm *= 255
+        hand_norm = np.uint8(hand_norm)
+
+        pil_img = Image.fromarray(hand_norm)
+        img = ImageTk.PhotoImage(pil_img)
+        self.normalized_view.configure(image=img)
+        self.normalized_view.image = img
 
         if True:  # If success:
             # self.on_letter_classified(pred_list)
