@@ -1,13 +1,16 @@
 import tkinter as tk
-from  App.Modules.DetectorAdapter import DetectorAdapterMockup
+from PIL import ImageTk
+from App.Modules.DetectorAdapter import DetectorAdapterMockup
+import matplotlib.pyplot as plt
 
 class MainWindow(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, message_queue, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.init_layout()
 
-        self.detector = DetectorAdapterMockup(self.on_new_frame, self.on_hand_detected)
+        self.detector = DetectorAdapterMockup(message_queue)
+
 
     def init_layout(self):
         unit_size = 29
@@ -22,11 +25,11 @@ class MainWindow(tk.Tk):
             frame = tk.Frame(parent, height=height, width=width, bg=bg)
             frame.grid(row=row, column=column,
                        rowspan=rowspan, columnspan=columnspan,
-                       padx=padding_x, pady=padding_y, sticky='nesw')
+                       padx=int(padding_x), pady=int(padding_y), sticky='nesw')
             frame.pack_propagate(False)
             return frame
 
-        information_frame = init_frame(parent=self, height=units(padding_y*2 + 20), width=units(padding_x*2 + 28),
+        information_frame = init_frame(parent=self, height=units(padding_y * 2 + 20), width=units(padding_x * 2 + 28),
                                        row=0, column=0, bg='lightgray')
 
         # 1st row
@@ -38,20 +41,24 @@ class MainWindow(tk.Tk):
         predicted_text['font'] = ('Ubuntu Mono', '32')
 
         # 2nd row
-        self.video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
+        video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
                                        row=1, column=0, rowspan=2)
 
-        self.hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
+        hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
                                       row=1, column=1)
 
-        self.normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
+        self.image_label = tk.Label(hand_view_f)
+        self.image_label['background'] = 'red'
+        self.image_label.pack()
+
+        normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
                                             row=2, column=1)
 
-        self.prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
+        prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                             row=1, column=2, rowspan=2)
 
         # 3rd row
-        self.application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
+        application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
                                              row=3, column=0, columnspan=3)
 
     def load_new_frame(self, frame):
@@ -76,10 +83,11 @@ class MainWindow(tk.Tk):
         # Wczytaj zdjecie reki z HAND VIEW, wykonaj predict() na modelu Normalizatora i wyślij do NORMALIZED VIEW
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
 
-        img = tk.PhotoImage(hand_img, master=self.hand_view_f)
-        # img.pack()
-        print("Works!")
+        img = ImageTk.PhotoImage(hand_img)
+        self.image_label.configure(image=img)
+        self.image_label.image = img
 
+        print("on_hand_detected called")
         if True:  # If success:
             # self.on_hand_normalized(hand_norm)
             pass
@@ -99,4 +107,3 @@ class MainWindow(tk.Tk):
         # Wyświetl listę prawdopodobieństw do PREDICTION VIEW
 
         pass
-

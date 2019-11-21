@@ -1,39 +1,47 @@
 from time import sleep
 from os import listdir
 from PIL.Image import Image as PILImage, open as PILOpen
-from multiprocessing import Process
-from random import sample
+from multiprocessing import Process, Queue
+import random
+import matplotlib.pyplot as plt
 
 
 class DetectorAdapter:
 
-    def __init__(self, on_frame_loaded_callback, on_hand_detected_callback):
-        self._on_frame_loaded_callback = on_frame_loaded_callback
-        self._on_hand_detected_callback = on_hand_detected_callback
+    def __init__(self, message_queue):
+        self._message_queue: Queue = message_queue
 
 
 class DetectorAdapterMockup(DetectorAdapter):
     mock_images_path = '/home/pawel/PycharmProjects/SignLangRecog/src/App/Modules/MockupHandImages'
     mock_images = []
 
-    def __init__(self, on_frame_loaded_callback, on_hand_detected_callback):
-        super().__init__(on_frame_loaded_callback, on_hand_detected_callback)
+    def __init__(self, message_queue):
+        super().__init__(message_queue)
 
         # Load all images from mock images path to be displayed
         img_name_list = listdir(self.mock_images_path)
 
         for img_name in img_name_list:
             img_path = self.mock_images_path + '/' + img_name
-            self.mock_images.append(PILOpen(img_path))
 
-        loop_process = Process(target=self.module_loop)
+            img = PILOpen(img_path)
+            self.mock_images.append(img)
+
+        loop_process = Process(target=self.module_loop, args=(self._message_queue,))
         loop_process.start()
 
-    def module_loop(self):
+    def module_loop(self, queue: Queue):
 
         while True:
             sleep(2)
 
-            img_to_send = sample(self.mock_images, 1)
+            index = random.randint(0, len(self.mock_images) - 1)
+            print(index)
 
-            self._on_hand_detected_callback(img_to_send)
+            message = (
+                "hand_detected",
+                self.mock_images[index]
+            )
+
+            queue.put(message)
