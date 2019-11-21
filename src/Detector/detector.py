@@ -1,4 +1,4 @@
-import detect_multi_threaded
+from utils import detect_multi_threaded
 from utils import detector_utils as detector_utils
 import queue
 import cv2
@@ -16,9 +16,7 @@ if __name__ == '__main__':
             output_frame = detector.getFrame()
             fps = detector.getFps()
             if (output_frame is not None):
-                    if (args.fps > 0):
-                        detector_utils.draw_fps_on_image("FPS : " + str(int(fps)),
-                                                        output_frame)
+                    detector_utils.draw_fps_on_image("FPS : " + str(int(fps)), output_frame)
                     cv2.imshow('Multi-Threaded Detection', output_frame)
                         
                     box_image = detector.getBoxImage()
