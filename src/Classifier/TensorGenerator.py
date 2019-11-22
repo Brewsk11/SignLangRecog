@@ -1,5 +1,6 @@
 from pickle import dump, load
 import numpy
+import random
 
 from Classifier.Providers.DirectoryImageProvider import DirectoryImageProvider
 from Classifier.Models.TensorBuilder import TensorBuilder
@@ -10,7 +11,7 @@ from Classifier.Models.LettersTensorBuilder import LettersTensorBuilder
 generate_new_or_connect = False
 res = 128
 seed = 69
-tagged_data_dir = 'LiterkiPawel2'
+tagged_data_dir = 'AllExceptNothing'
 
 main_path = 'C:/Users/jakub/Desktop/Inżynierka/'
 tensors_dir = 'Tensors/'
@@ -36,26 +37,39 @@ if __name__ == "__main__":
 
     else:
         print("Loading part tensors")
-        with open(main_path + tensors_dir + 'LiterkiPawel1_tagged_images_128.tsr', 'rb') as images_file:
+        with open(main_path + tensors_dir + '12exp_images.tsr', 'rb') as images_file:
             images_tensor1 = load(images_file)
 
-        with open(main_path + tensors_dir + 'LiterkiPawel2_tagged_images_128.tsr', 'rb') as images_file:
+        with open(main_path + tensors_dir + '15exp_images.tsr', 'rb') as images_file:
             images_tensor2 = load(images_file)
 
-        with open(main_path + tensors_dir + 'LiterkiPawel1_letters_128.tsr', 'rb') as letters_file:
+        with open(main_path + tensors_dir + '12exp_letters.tsr', 'rb') as letters_file:
             letters_tensor1 = load(letters_file)
 
-        with open(main_path + tensors_dir + 'LiterkiPawel2_letters_128.tsr', 'rb') as letters_file:
+        with open(main_path + tensors_dir + '15exp_letters.tsr', 'rb') as letters_file:
             letters_tensor2 = load(letters_file)
 
         print("Connecting tensors")
+
         images_tensor1._tensor = numpy.concatenate((images_tensor1.tensor, images_tensor2.tensor))
         images_tensor1._length = images_tensor1._length + images_tensor2._length
+        images_tensor1._img_list.extend(images_tensor2._img_list)
         letters_tensor1._tensor = numpy.concatenate((letters_tensor1.tensor, letters_tensor2.tensor))
         letters_tensor1._length = letters_tensor1._length + letters_tensor2._length
 
-        images_tensor_path = main_path + tensors_dir + 'images.tsr'
-        letters_tensor_path = main_path + tensors_dir + 'letters.tsr'
+        #shuffle connected tensors
+        print("Shuffle connected tensors")
+        """
+        numpy.random.seed(seed)
+        random.seed(seed)
+        numpy.random.shuffle(images_tensor1._tensor)
+        numpy.random.shuffle(letters_tensor1._tensor)
+        random.shuffle(images_tensor1._img_list)
+        """
+
+
+        images_tensor_path = main_path + tensors_dir + '27exp_images.tsr'
+        letters_tensor_path = main_path + tensors_dir + '27exp_letters.tsr'
 
         print("Saving full tensors")
         with open(images_tensor_path, 'wb') as images_file:

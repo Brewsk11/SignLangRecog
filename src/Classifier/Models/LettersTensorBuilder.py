@@ -26,7 +26,7 @@ class LettersTensorBuilder:
         return self
 
     def __list_to_letter_tensor(self, img_list: list) -> ndarray:
-        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'nothing', 'O',
+        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
                    'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
         tensor_list = []
@@ -39,10 +39,10 @@ class LettersTensorBuilder:
         for img in img_list:
             letter_list = []
             for letter in letters:
-                if img.letter is letter:
-                    letter_list.append(1)
+                if img.letter == letter:
+                    letter_list.append(float(1))
                 else:
-                    letter_list.append(0)
+                    letter_list.append(float(0))
             # Update progress
             if i % 500 == 0 or i == img_list_len:
                 print(f'{self.__class__.__name__}: [{i}/{img_list_len}]')
