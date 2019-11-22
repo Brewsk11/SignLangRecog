@@ -7,10 +7,11 @@ import matplotlib.pyplot as plt
 import keras
 import numpy as np
 from Normalizer.Models.TensorBuilder import TensorBuilder
+import time
 
 
 class NormalizerAdapter:
-    model_path = '/home/pawel/PracaInzynierska/Normalizer/Models/dad07_UNetModel_e003'
+    model_path = '/home/pawel/PracaInzynierska/Normalizer/Models/dad07_UNetModel_e002'
     tensor_size = (128, 128)
 
     def __init__(self, message_queue):
@@ -23,9 +24,11 @@ class NormalizerAdapter:
         tsr_img = self.image_to_tensor(hand_photo)
         tsr_arr = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
 
-        print("Predicting contour...")
+        t0 = time.clock()
         pred = self.model.predict(tsr_arr)
-        print("Prediction complete.") # TODO: Change to time elapsed?
+        t1 = time.clock()
+        elapsed = t1 - t0
+        print(f"Prediction complete in {elapsed}")  # TODO: Change to time elapsed?
 
         pred = pred.reshape((128, 128))
 
@@ -36,6 +39,8 @@ class NormalizerAdapter:
 
         self._message_queue.put(message)
 
+    def normalizer_worker(self, hand_photo: PILImage):
+        pass
 
     def image_to_tensor(self, pil_img):
 
