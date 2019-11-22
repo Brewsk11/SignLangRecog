@@ -1,13 +1,9 @@
-from time import sleep
-from os import listdir
-from PIL.Image import Image as PILImage, open as PILOpen
-from multiprocessing import Process, Queue
-import random
-import matplotlib.pyplot as plt
+import time
+from multiprocessing import Queue, Process
+
 import keras
 import numpy as np
-from Normalizer.Models.TensorBuilder import TensorBuilder
-import time
+from PIL.Image import Image as PILImage
 
 
 class NormalizerAdapter:
@@ -15,32 +11,39 @@ class NormalizerAdapter:
     tensor_size = (128, 128)
 
     def __init__(self, message_queue):
-        self._message_queue: Queue = message_queue
+        self._master_queue: Queue = message_queue
+        self._prediction_queue = Queue()
 
-        self.model: keras.Model = keras.models.load_model(self.model_path)
+        normalizer_process = Process(target=self.normalizer_worker)
+        normalizer_process.start()
 
     def normalize(self, hand_photo: PILImage):
+        self._prediction_queue.put(hand_photo)
 
-        tsr_img = self.image_to_tensor(hand_photo)
-        tsr_arr = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
+    def normalizer_worker(self):
 
-        t0 = time.clock()
-        pred = self.model.predict(tsr_arr)
-        t1 = time.clock()
-        elapsed = t1 - t0
-        print(f"Prediction complete in {elapsed}")  # TODO: Change to time elapsed?
+        model: keras.Model = keras.models.load_model(self.model_path)
 
-        pred = pred.reshape((128, 128))
+        while True:
+            hand_photo = self._prediction_queue.get(block=True)
 
-        message = (
-            'hand_normalized',
-            pred
-        )
+            tsr_img = self.image_to_tensor(hand_photo)
+            tsr_arr = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
 
-        self._message_queue.put(message)
+            t0 = time.clock()
+            pred = model.predict(tsr_arr)
+            t1 = time.clock()
+            elapsed = t1 - t0
+            print(f"Prediction complete in {elapsed}")
 
-    def normalizer_worker(self, hand_photo: PILImage):
-        pass
+            pred = pred.reshape((128, 128))
+
+            message = (
+                'hand_normalized',
+                pred
+            )
+
+            self._master_queue.put(message)
 
     def image_to_tensor(self, pil_img):
 

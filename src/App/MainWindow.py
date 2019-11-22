@@ -97,8 +97,6 @@ class MainWindow(tk.Tk):
         self.hand_view.configure(image=img)
         self.hand_view.image = img
 
-        print("on_hand_detected called")
-
         self.normalizer.normalize(hand_img)
 
     def on_hand_normalized(self, hand_norm: np.array):

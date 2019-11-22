@@ -1,8 +1,9 @@
 from App.MainWindow import MainWindow
 from multiprocessing import Queue
-from time import sleep
+import keras
 
 if __name__ == "__main__":
+    # keras.backend.set_learning_phase(0)
 
     task_queue = Queue()
     app = MainWindow(task_queue)
