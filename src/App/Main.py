@@ -20,3 +20,6 @@ if __name__ == "__main__":
 
             elif message == "hand_normalized":
                 app.on_hand_normalized(payload)
+
+            elif message == "sign_classified":
+                app.on_letter_classified(payload)
