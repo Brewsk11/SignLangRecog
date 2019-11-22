@@ -9,6 +9,7 @@ from os.path import isdir, isfile
 from Normalizer.Providers.DirectoryImageProvider import  DirectoryImageProvider as ImgProvider
 from Normalizer.Models.ImageModels import TrainingImage, TaggedImage
 
+
 def cutout_black(img: Image.Image):
     imgdata = img.load()
 
@@ -60,19 +61,19 @@ def generate_new_image(bg: Image.Image, org: Image.Image, tgg: Image.Image):
 
     gen = Image.new('RGBA', aug_org.size)
     gen.paste(cropped_bg, (0, 0), cropped_bg)
-    gen.paste(aug_org, (0, 0), aug_tgg_alpha)
+    # gen.paste(aug_org, (0, 0), aug_tgg_alpha)
 
     return gen, aug_tgg
 
 
 if __name__ == "__main__":
     img_path = '/home/pawel/PracaInzynierska/tmp'
-    background_paths = ['/home/pawel/PracaInzynierska/bg_cluttered', '/home/pawel/PracaInzynierska/bg_clean']
+    background_paths = ['/home/pawel/PracaInzynierska/room_bg']
     org_path = '/home/pawel/PracaInzynierska/TrainingData'
     tgg_path = '/home/pawel/PracaInzynierska/LiterkiTagged'
 
-    new_org_path = '/home/pawel/PracaInzynierska/TrainingData_NewBG'
-    new_tgg_path = '/home/pawel/PracaInzynierska/LiterkiTagged_NewBG'
+    new_org_path = '/home/pawel/PracaInzynierska/TrainingData_NewerBG_nothing'
+    new_tgg_path = '/home/pawel/PracaInzynierska/LiterkiTagged_NewerBG_nothing'
 
     bg_imgs = []
     for pth in background_paths:
@@ -99,7 +100,7 @@ if __name__ == "__main__":
         org = org_imgs[i].pillow_image.resize((128, 128), resample=Image.BICUBIC).convert('RGBA')
         tgg = tgg_imgs[i].pillow_image.convert('RGBA')
 
-        for j in range(20):
+        for j in range(1):
 
             bg_w, bg_h = 0, 0
             while bg_w < 128 or bg_h < 128:
@@ -112,17 +113,17 @@ if __name__ == "__main__":
             if not isdir(new_org_path + '/' + org_imgs[i].letter):
                 mkdir(new_org_path + '/' + org_imgs[i].letter)
 
-            if not isdir(new_tgg_path + '/' + tgg_imgs[i].letter):
-                mkdir(new_tgg_path + '/' + tgg_imgs[i].letter)
+            # if not isdir(new_tgg_path + '/' + tgg_imgs[i].letter):
+                # mkdir(new_tgg_path + '/' + tgg_imgs[i].letter)
 
             new_org.convert('RGB').resize((128, 128), resample=Image.BICUBIC).save(new_org_path + '/' + org_imgs[i].letter + '/' + org_imgs[i].filename.split('.')[0] + f'{j:02d}.jpg')
-            new_tgg.convert('RGB').resize((128, 128), resample=Image.BICUBIC).save(new_tgg_path + '/' + tgg_imgs[i].letter + '/' + tgg_imgs[i].filename.split('_')[0] + f'{j:02d}' + '_128.bmp')
+            # new_tgg.convert('RGB').resize((128, 128), resample=Image.BICUBIC).save(new_tgg_path + '/' + tgg_imgs[i].letter + '/' + tgg_imgs[i].filename.split('_')[0] + f'{j:02d}' + '_128.bmp')
 
         if i % 50 == 0:
             print(f'[{i}/{len(org_imgs)}]')
 
     """concurrent_images_download(
-        search_term='room background photo clean',
+        search_term='room photo',
         max_image_fetching_threads=20,
         image_download_timeout=5,
         total_images=200,
@@ -132,7 +133,7 @@ if __name__ == "__main__":
         extensions=['jpg']
     )"""
 
-"""    tgg = Image.open(img_path + '/tgg_128.bmp').convert('RGBA')
+    """tgg = Image.open(img_path + '/tgg_128.bmp').convert('RGBA')
     tgg = tgg.resize((200, 200), resample=Image.BICUBIC).convert('RGBA')
     org = Image.open(img_path + '/org_200.jpg').convert('RGBA')
     bg = Image.open(img_path + '/bg.jpg').convert('RGBA')
