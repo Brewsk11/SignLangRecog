@@ -1,10 +1,8 @@
 import tkinter as tk
 import numpy as np
 from PIL import ImageTk, Image
-from App.Modules.DetectorAdapter import DetectorAdapterMockup
-from App.Modules.NormalizerAdapter import NormalizerAdapter
-from App.Modules.ClassifierAdapter import ClassifierAdapter
 import matplotlib.pyplot as plt
+
 
 class MainWindow(tk.Tk):
 
