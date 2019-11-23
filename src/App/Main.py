@@ -59,12 +59,13 @@ if __name__ == "__main__":
                     module_ready['detector'] = True
                 elif message == "normalizer_ready":
                     module_ready['normalizer'] = True
-                elif message == "normalizer_ready":
+                elif message == "classifier_ready":
                     module_ready['classifier'] = True
 
                 if module_ready['detector'] and \
                    module_ready['normalizer'] and \
                    module_ready['classifier']:
                     module_ready['system'] = True
+                    print('System ready!')
                 else:
                     module_ready['system'] = False
