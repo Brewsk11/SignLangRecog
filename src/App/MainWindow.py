@@ -12,10 +12,6 @@ class MainWindow(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.init_layout()
 
-        self.detector = DetectorAdapterMockup(message_queue)
-        self.normalizer = NormalizerAdapter(message_queue)
-        self.classifier = ClassifierAdapter(message_queue)
-
     def init_layout(self):
         unit_size = 48
 
@@ -99,14 +95,10 @@ class MainWindow(tk.Tk):
         self.hand_view.configure(image=img)
         self.hand_view.image = img
 
-        self.normalizer.normalize(hand_img)
-
     def on_hand_normalized(self, hand_norm: np.ndarray):
         # TODO: Kuba
         # Wczytaj kontur z NORMALIZED VIEW, wykonaj predict() na modelu Klasyfikatora
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
-
-        classifier_input = hand_norm
 
         # Rescale the array to 0-255
         hand_norm *= 255
@@ -122,8 +114,6 @@ class MainWindow(tk.Tk):
         self.normalized_view.configure(image=img)
         self.normalized_view.image = img
 
-        self.classifier.classify(classifier_input)
-
     def on_letter_classified(self, pred_list: np.ndarray):
         labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                   'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
@@ -134,7 +124,3 @@ class MainWindow(tk.Tk):
         index = np.arange(len(labels))
         plt.bar(index, pred_list)
 
-
-
-
-        pass

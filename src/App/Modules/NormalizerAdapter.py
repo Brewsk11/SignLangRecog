@@ -7,11 +7,12 @@ from PIL.Image import Image as PILImage
 
 
 class NormalizerAdapter:
-    model_path = '/home/pawel/PracaInzynierska/Normalizer/Models/dad07_UNetModel_e002'
     tensor_size = (128, 128)
 
-    def __init__(self, message_queue):
-        self._master_queue: Queue = message_queue
+    def __init__(self, settings):
+        self._master_queue: Queue = settings['master_queue']
+        self.model_path = settings['normalizer_settings']['model_path']
+
         self._prediction_queue = Queue()
 
         normalizer_process = Process(target=self.normalizer_worker)

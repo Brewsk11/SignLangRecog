@@ -8,16 +8,18 @@ import matplotlib.pyplot as plt
 
 class DetectorAdapter:
 
-    def __init__(self, message_queue):
-        self._message_queue: Queue = message_queue
+    def __init__(self, settings):
+        self.settings: dict = settings
 
 
 class DetectorAdapterMockup(DetectorAdapter):
     mock_images_path = '/home/pawel/PycharmProjects/SignLangRecog/src/App/Modules/MockupHandImages'
     mock_images = []
 
-    def __init__(self, message_queue):
-        super().__init__(message_queue)
+    def __init__(self, settings):
+        super().__init__(settings)
+
+        self._message_queue = settings['master_queue']
 
         # Load all images from mock images path to be displayed
         img_name_list = listdir(self.mock_images_path)
