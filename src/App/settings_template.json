@@ -1,5 +1,11 @@
 {
+  "detector_settings": {
+    "model_path": ""
+  },
   "normalizer_settings": {
+    "model_path": ""
+  },
+  "classifier_settings": {
     "model_path": ""
   }
 }

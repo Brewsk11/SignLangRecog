@@ -120,7 +120,7 @@ class MainWindow(tk.Tk):
 
         pred_list.flatten()
         classified_letter = labels[pred_list.argmax()]
-
+        print("Damn Daniel, I have just predicted the letter: " + classified_letter)
         index = np.arange(len(labels))
         plt.bar(index, pred_list)
 
