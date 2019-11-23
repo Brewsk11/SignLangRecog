@@ -60,8 +60,13 @@ class MainWindow(tk.Tk):
         self.normalized_view['background'] = 'blue'
         self.normalized_view.pack(expand=True, fill='both')
 
-        self.prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
+        prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                        row=1, column=2, rowspan=2)
+
+        f = Figure(figsize=(2, 3), dpi=72)
+        self.prediction_info_axe = f.add_subplot(111)
+        self.prediction_info = FigureCanvasTkAgg(f, master=prediction_info_f)
+        self.prediction_info.get_tk_widget().pack(expand=True, fill='both')
 
         # 3rd row
         application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
@@ -124,14 +129,12 @@ class MainWindow(tk.Tk):
         classified_letter = labels[pred_list.argmax()]
         print("Damn Daniel, I have just predicted the letter: " + classified_letter)
 
-        #rysowanie
-        index = np.arange(len(labels))
-        f = Figure(figsize=(6 ,9), dpi = 29)
-        ax = f.add_subplot(111)
-        ax.barh(index, pred_list)
-        for child in self.prediction_info_f.winfo_children():
-            child.destroy()
-        canvas = FigureCanvasTkAgg(f, master=self.prediction_info_f)
-        canvas.draw()
-        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+        # Drawing
+        # call the clear method on your axes
+        self.prediction_info_axe.clear()
 
+        index = np.arange(len(labels))
+        self.prediction_info_axe.barh(index, pred_list)
+
+        # call the draw method on your canvas
+        self.prediction_info.draw()
