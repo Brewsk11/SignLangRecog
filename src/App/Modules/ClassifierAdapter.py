@@ -3,7 +3,7 @@ import keras
 import numpy as np
 
 class ClassifierAdapter:
-    model_path = ''
+    model_path = 'C:/Users/jakub/Desktop/Inżynierka/SignLangRecog/bin/Models/Classifier/c5970_ClassifierModel_e088'
 
     def __init__(self, message_queue):
         self._message_queue: Queue = message_queue
@@ -11,8 +11,7 @@ class ClassifierAdapter:
         self.correct_shape = (1, 27)
 
     def classify(self, input_tensor: np.ndarray):
-        prediction = np.zeros(1, 27)
-        if (prediction.shape != self.correct_shape):
+        if (input_tensor.shape != self.correct_shape):
             raise RuntimeError("Wrong tensor shape!")
 
         prediction = self.model.predict(input_tensor)
@@ -22,4 +21,4 @@ class ClassifierAdapter:
             prediction
         )
 
-        self._message_queue(message)
+        self._message_queue.put(message)

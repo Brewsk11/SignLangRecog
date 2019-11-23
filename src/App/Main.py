@@ -1,8 +1,15 @@
 from App.MainWindow import MainWindow
 from multiprocessing import Queue
-
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
 
 if __name__ == "__main__":
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    config.log_device_placement = True
+
+    sess = tf.Session(config=config)
+    set_session(sess)
 
     task_queue = Queue()
     app = MainWindow(task_queue)

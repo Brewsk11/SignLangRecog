@@ -3,6 +3,7 @@ import numpy as np
 from PIL import ImageTk, Image
 from App.Modules.DetectorAdapter import DetectorAdapterMockup
 from App.Modules.NormalizerAdapter import NormalizerAdapter
+from App.Modules.ClassifierAdapter import ClassifierAdapter
 import matplotlib.pyplot as plt
 
 class MainWindow(tk.Tk):
@@ -13,6 +14,7 @@ class MainWindow(tk.Tk):
 
         self.detector = DetectorAdapterMockup(message_queue)
         self.normalizer = NormalizerAdapter(message_queue)
+        self.classifier = ClassifierAdapter(message_queue)
 
     def init_layout(self):
         unit_size = 48
@@ -99,10 +101,12 @@ class MainWindow(tk.Tk):
 
         self.normalizer.normalize(hand_img)
 
-    def on_hand_normalized(self, hand_norm: np.array):
+    def on_hand_normalized(self, hand_norm: np.ndarray):
         # TODO: Kuba
         # Wczytaj kontur z NORMALIZED VIEW, wykonaj predict() na modelu Klasyfikatora
         # Prefferably/must-have na osobnym wątku (operacje z siecią)
+
+        classifier_input = hand_norm
 
         # Rescale the array to 0-255
         hand_norm *= 255
@@ -118,13 +122,19 @@ class MainWindow(tk.Tk):
         self.normalized_view.configure(image=img)
         self.normalized_view.image = img
 
-        if True:  # If success:
-            # self.on_letter_classified(pred_list)
-            pass
+        self.classifier.classify(classifier_input)
 
-    def on_letter_classified(self, pred_list):
-        # TODO: Kuba
-        # Zczytaj prawodopodobienstwa predykcji, sprawdz czy ta sama litera nie była w poprzednich klatkach
-        # Wyświetl listę prawdopodobieństw do PREDICTION VIEW
+    def on_letter_classified(self, pred_list: np.ndarray):
+        labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                  'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+        pred_list.flatten()
+        classified_letter = labels[pred_list.argmax()]
+
+        index = np.arange(len(labels))
+        plt.bar(index, pred_list)
+
+
+
 
         pass
