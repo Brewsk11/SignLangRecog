@@ -1,10 +1,10 @@
-from App.MainWindow import MainWindow
+from MainWindow import MainWindow
 from multiprocessing import Queue
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
-from App.Modules.NormalizerAdapter import NormalizerAdapter
-from App.Modules.DetectorAdapter import DetectorAdapterMockup
-from App.Modules.ClassifierAdapter import ClassifierAdapter
+from Modules.NormalizerAdapter import NormalizerAdapter
+from Modules.DetectorAdapter import DetectorAdapter
+from Modules.ClassifierAdapter import ClassifierAdapter
 import json
 
 settings_path = './settings.json'
@@ -20,9 +20,9 @@ if __name__ == "__main__":
     task_queue = Queue()
     settings['master_queue'] = task_queue
 
-    detector = DetectorAdapterMockup(settings)
+    detector = DetectorAdapter(settings)
     normalizer = NormalizerAdapter(settings)
-    classifier = ClassifierAdapter(settings)
+    # classifier = ClassifierAdapter(settings)
 
     app = MainWindow(task_queue)
 
@@ -39,9 +39,12 @@ if __name__ == "__main__":
                 app.on_hand_detected(payload)
                 normalizer.normalize(payload)
 
-            elif message == "hand_normalized":
-                app.on_hand_normalized(payload)
-                classifier.classify(payload)
+            elif message == "video_frame":
+                app.on_new_frame(payload)
 
-            elif message == "sign_classified":
-                app.on_letter_classified(payload)
+            # elif message == "hand_normalized":
+            #     app.on_hand_normalized(payload)
+            #     classifier.classify(payload)
+
+            # elif message == "sign_classified":
+            #     app.on_letter_classified(payload)
