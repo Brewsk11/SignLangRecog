@@ -4,8 +4,11 @@ from PIL import ImageTk, Image
 from App.Modules.DetectorAdapter import DetectorAdapterMockup
 from App.Modules.NormalizerAdapter import NormalizerAdapter
 from App.Modules.ClassifierAdapter import ClassifierAdapter
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 class MainWindow(tk.Tk):
 
@@ -122,12 +125,15 @@ class MainWindow(tk.Tk):
         pred_list = pred_list.flatten()
         classified_letter = labels[pred_list.argmax()]
         print("Damn Daniel, I have just predicted the letter: " + classified_letter)
+
+        #rysowanie
         index = np.arange(len(labels))
-        plt.barh(index, pred_list)
-        plt.yticks(index, labels)
-        plt.show()
-        canvas = FigureCanvasTkAgg(plot, master=self.prediction_info_f)
-        canvas.show()
-        canvas.get_tk_widget().pack()
-        plt.show()
+        f = Figure(figsize=(6 ,9), dpi = 29)
+        ax = f.add_subplot(111)
+        ax.barh(index, pred_list)
+        for child in self.prediction_info_f.winfo_children():
+            child.destroy()
+        canvas = FigureCanvasTkAgg(f, master=self.prediction_info_f)
+        canvas.draw()
+        canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
