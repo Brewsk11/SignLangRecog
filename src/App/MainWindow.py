@@ -1,14 +1,12 @@
 import tkinter as tk
 import numpy as np
 from PIL import ImageTk, Image
-from App.Modules.DetectorAdapter import DetectorAdapterMockup
-from App.Modules.NormalizerAdapter import NormalizerAdapter
-from App.Modules.ClassifierAdapter import ClassifierAdapter
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+
 
 class MainWindow(tk.Tk):
 
