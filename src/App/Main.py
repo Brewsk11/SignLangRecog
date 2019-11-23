@@ -24,7 +24,7 @@ if __name__ == "__main__":
     normalizer = NormalizerAdapter(settings)
     classifier = ClassifierAdapter(settings)
 
-    app = MainWindow(task_queue)
+    app = MainWindow()
 
     while True:
         app.update_idletasks()

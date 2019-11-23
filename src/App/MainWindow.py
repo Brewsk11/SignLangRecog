@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 
 class MainWindow(tk.Tk):
 
-    def __init__(self, message_queue, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.init_layout()
 
