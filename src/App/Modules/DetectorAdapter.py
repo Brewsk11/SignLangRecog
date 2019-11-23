@@ -10,6 +10,9 @@ class DetectorAdapter:
 
     def __init__(self, settings):
         self.settings: dict = settings
+        self._message_queue: Queue = settings['master_queue']
+
+        self._message_queue.put(('detector_ready', None))
 
 
 class DetectorAdapterMockup(DetectorAdapter):
@@ -19,7 +22,6 @@ class DetectorAdapterMockup(DetectorAdapter):
         super().__init__(settings)
         self.mock_images_path = self.settings['mock_images_path']
 
-        self._message_queue = settings['master_queue']
 
         # Load all images from mock images path to be displayed
         img_name_list = listdir(self.mock_images_path)
