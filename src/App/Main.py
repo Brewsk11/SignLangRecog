@@ -22,7 +22,7 @@ if __name__ == "__main__":
 
     detector = DetectorAdapterMockup(settings)
     normalizer = NormalizerAdapter(settings)
-    # classifier = ClassifierAdapter(settings)
+    classifier = ClassifierAdapter(settings)
 
     app = MainWindow(task_queue)
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
             elif message == "hand_normalized":
                 app.on_hand_normalized(payload)
-                # classifier.classify(payload)
+                classifier.classify(payload)
 
             elif message == "sign_classified":
                 app.on_letter_classified(payload)
