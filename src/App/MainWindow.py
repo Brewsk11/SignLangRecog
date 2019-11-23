@@ -1,6 +1,7 @@
 import tkinter as tk
 import numpy as np
 from PIL import ImageTk, Image
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
 
@@ -56,7 +57,7 @@ class MainWindow(tk.Tk):
         self.normalized_view['background'] = 'blue'
         self.normalized_view.pack(expand=True, fill='both')
 
-        prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
+        self.prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                        row=1, column=2, rowspan=2)
 
         # 3rd row
@@ -116,9 +117,15 @@ class MainWindow(tk.Tk):
         labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                   'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-        pred_list.flatten()
+        pred_list = pred_list.flatten()
         classified_letter = labels[pred_list.argmax()]
         print("Damn Daniel, I have just predicted the letter: " + classified_letter)
         index = np.arange(len(labels))
-        plt.bar(index, pred_list)
+        plt.barh(index, pred_list)
+        plt.yticks(index, labels)
+        plt.show()
+        canvas = FigureCanvasTkAgg(plot, master=self.prediction_info_f)
+        canvas.show()
+        canvas.get_tk_widget().pack()
+        plt.show()
 

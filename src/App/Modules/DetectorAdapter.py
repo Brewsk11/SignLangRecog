@@ -34,8 +34,16 @@ class DetectorAdapterMockup(DetectorAdapter):
         loop_process.start()
 
     def module_loop(self, queue: Queue):
+        img_name_list = listdir(self.mock_images_path)
+
+        for img_name in img_name_list:
+            img_path = self.mock_images_path + '/' + img_name
+
+            img = PILOpen(img_path)
+            self.mock_images.append(img)
 
         while True:
+
             sleep(2)
             index = random.randint(0, len(self.mock_images) - 1)
 
