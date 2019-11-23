@@ -3,10 +3,10 @@ import keras
 import numpy as np
 
 class ClassifierAdapter:
-    model_path = 'C:/Users/jakub/Desktop/Inżynierka/SignLangRecog/bin/Models/Classifier/c5970_ClassifierModel_e088'
 
-    def __init__(self, message_queue):
-        self._message_queue: Queue = message_queue
+    def __init__(self, settings):
+        self._master_queue: Queue = settings['master_queue']
+        self.model_path = ['classfiier_settings']['model_path']
         self.model: keras.Model = keras.models.load_model(self.model_path)
         self.correct_shape = (1, 27)
 

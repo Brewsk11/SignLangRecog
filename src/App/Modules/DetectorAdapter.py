@@ -13,11 +13,11 @@ class DetectorAdapter:
 
 
 class DetectorAdapterMockup(DetectorAdapter):
-    mock_images_path = '/home/pawel/PycharmProjects/SignLangRecog/src/App/Modules/MockupHandImages'
     mock_images = []
 
     def __init__(self, settings):
         super().__init__(settings)
+        self.mock_images_path = self.settings['mock_images_path']
 
         self._message_queue = settings['master_queue']
 
