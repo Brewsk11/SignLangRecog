@@ -12,8 +12,8 @@ from sklearn.utils.multiclass import unique_labels
 
 tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
 models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
-images_tensor_name = 'all_images.tsr'
-letters_tensor_name = 'all_letters.tsr'
+images_tensor_name = 'test_images.tsr'
+letters_tensor_name = 'test_letters.tsr'
 res = 128
 train_validation_ratio = 0.9
 test_num = 100
@@ -24,11 +24,12 @@ model_path = models_dir + model_file
 
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.figure(figsize=(12, 10))
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.imshow(cm, interpolation='none', cmap=cmap)
     plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=90)
-    plt.yticks(tick_marks, classes)
+    tick_marks = np.arange(0, 27, 1)
+    tick_marks_y = np.arange(-0.5, 27.5, 1)
+    plt.xticks(tick_marks, classes)
+    plt.yticks(tick_marks_y, classes)
 
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -46,14 +47,13 @@ def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix'
                      color="white" if cm[i, j] > thresh else "black")
         else:
             pass
-            #plt.text(j, i, "{:,}".format(cm[i, j]),
-             #        horizontalalignment="center",
-              #       color="white" if cm[i, j] > thresh else "black")
+            plt.text(j, i, "{:,}".format(cm[i, j]),
+                     horizontalalignment="center",
+                     color="white" if cm[i, j] > thresh else "black")
 
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    #plt.grid()
     plt.show()
 
 if __name__ == "__main__":
@@ -88,13 +88,15 @@ if __name__ == "__main__":
     classes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
                'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
+    test_images = test_images._tensor
+    test_letters = test_letters._tensor
+
     predicted_letters = model.predict(test_images)
     predicted_letters = np.argmax(predicted_letters, axis=1)
     test_letters = np.argmax(test_letters, axis=1)
 
-    cm = confusion_matrix(test_letters, predicted_letters)
+    cm = confusion_matrix(test_letters, predicted_letters, labels=np.arange(len(classes)))
     plot_confusion_matrix(cm, classes, title="Confusion matrix")
-    plt.show()
 
     print("Trt")
 

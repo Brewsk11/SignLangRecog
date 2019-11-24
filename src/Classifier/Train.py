@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 
 tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
 models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
-images_tensor_name = 'all_images.tsr'
-letters_tensor_name = 'all_letters.tsr'
+images_tensor_name = 'train_images.tsr'
+letters_tensor_name = 'train_letters.tsr'
 res = 128
-train_validation_ratio = 0.9
-test_num = 100
+train_validation_ratio = 0.85
+test_num = 0
 model_class = NetworkModels.ClassifierModel
 
 if __name__ == "__main__":
@@ -29,19 +29,16 @@ if __name__ == "__main__":
     with open(tensors_dir + letters_tensor_name, 'rb') as letters_file:
         letters_tensor = load(letters_file)
 
-    #Cut tensors into training, validation and test sets
+    #Cut tensors into training and validation
 
-    train_num = int(images_tensor.length * train_validation_ratio)
-    validation_num = images_tensor.length - test_num - train_num
+    validation_num = int(images_tensor.length * train_validation_ratio)
 
-    train_images = images_tensor.tensor[:train_num]
-    train_letters = letters_tensor.tensor[:train_num]
+    train_images = images_tensor.tensor[:validation_num]
+    train_letters = letters_tensor.tensor[:validation_num]
 
-    validation_images = images_tensor.tensor[train_num:(train_num + validation_num)]
-    validation_letters = letters_tensor.tensor[train_num:(train_num + validation_num)]
+    validation_images = images_tensor.tensor[validation_num:]
+    validation_letters = letters_tensor.tensor[validation_num:]
 
-    test_images = images_tensor.tensor[(train_num + validation_num):]
-    test_letters = letters_tensor.tensor[(train_num + validation_num):]
 
     print('Images tensor shape: ' + str(images_tensor.tensor.shape))
     print('Letters tensor shape: ' + str(letters_tensor.tensor.shape))
