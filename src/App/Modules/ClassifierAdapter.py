@@ -1,6 +1,10 @@
+import multiprocessing
 from multiprocessing import Queue
 import keras
 import numpy as np
+from pickle import load
+import random
+import time
 
 class ClassifierAdapter:
 
@@ -25,3 +29,29 @@ class ClassifierAdapter:
         )
 
         self._master_queue.put(message)
+
+class ClassifierAdapterMockup(ClassifierAdapter):
+
+    def __init__(self, settings):
+        super().__init__(settings)
+        self.images_tensor_path = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/mockup_tensor.tsr'
+
+        loop_process = multiprocessing.Process(target=self.module_loop, args=(self._master_queue,))
+        loop_process.start()
+
+    def module_loop(self, queue: Queue):
+        with open(self.images_tensor_path, 'rb') as images_tensor_file:
+            images_tensor = load(images_tensor_file)
+
+        while True:
+            time.sleep(1)
+            index = random.randint(0, len(images_tensor) - 1)
+            input_tensor = images_tensor[index]
+            input_tensor = input_tensor.reshape(1, 128, 128, 1)
+            prediction = self.model.predict(input_tensor)
+
+            message = (
+                'sign_classified',
+                prediction
+            )
+            queue.put(message)
