@@ -8,13 +8,13 @@ from keras.optimizers import *
 from keras.callbacks import *
 import matplotlib.pyplot as plt
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inżynierka/Tensors/'
-models_dir = 'C:/Users/jakub/Desktop/Inżynierka/Models/'
-images_tensor_name = '27exp_images.tsr'
-letters_tensor_name = '27exp_letters.tsr'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
+models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
+images_tensor_name = 'all_images.tsr'
+letters_tensor_name = 'all_letters.tsr'
 res = 128
 train_validation_ratio = 0.9
-test_num = 50
+test_num = 100
 model_class = NetworkModels.ClassifierModel
 
 if __name__ == "__main__":
@@ -51,20 +51,13 @@ if __name__ == "__main__":
 
 
     #displaying img
-    """
     display_images = train_images
     display_images = display_images.reshape((len(display_images), 128, 128))
     plt.imshow(display_images[0])
-    plt.show()
+    #plt.show()
     plt.imshow(display_images[1])
-    plt.show()
-    plt.imshow(display_images[2])
-    plt.show()
-    plt.imshow(display_images[3])
-    plt.show()
-    plt.imshow(display_images[4])
-    plt.show()
-    """
+    #plt.show()
+
 
     # 3: -- Train the network --
 
@@ -78,9 +71,9 @@ if __name__ == "__main__":
 
     model.summary()
 
-    epochs_num = 200
-    batch_size = 32
-    save_every_n_epoch = 8  # How often the fit function will save the model to the models directory
+    epochs_num = 40
+    batch_size = 16
+    save_every_n_epoch = 4  # How often the fit function will save the model to the models directory
 
     history = model.fit(
                     x=train_images,
