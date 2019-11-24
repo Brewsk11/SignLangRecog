@@ -21,8 +21,8 @@ if __name__ == "__main__":
     settings['master_queue'] = task_queue
 
     detector = DetectorAdapter(settings)
-    # normalizer = NormalizerAdapter(settings)
-    # classifier = ClassifierAdapter(settings)
+    normalizer = NormalizerAdapter(settings)
+    classifier = ClassifierAdapter(settings)
 
     app = MainWindow()
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
             if module_ready['system']:
                 if message == "hand_detected":
                     app.on_hand_detected(payload)
-                    # normalizer.normalize(payload)
+                    normalizer.normalize(payload)
 
                 elif message == "hand_normalized":
                     app.on_hand_normalized(payload)
@@ -60,21 +60,15 @@ if __name__ == "__main__":
             else:
                 if message == "detector_ready":
                     module_ready['detector'] = True
-                # elif message == "normalizer_ready":
-                #     module_ready['normalizer'] = True
-                # elif message == "classifier_ready":
-                #     module_ready['classifier'] = True
+                elif message == "normalizer_ready":
+                    module_ready['normalizer'] = True
+                elif message == "classifier_ready":
+                    module_ready['classifier'] = True
 
-                if module_ready['detector']:
+                if module_ready['detector'] and \
+                   module_ready['normalizer'] and \
+                   module_ready['classifier']:
                     module_ready['system'] = True
                     print('System ready!')
                 else:
                     module_ready['system'] = False
-
-                # if module_ready['detector'] and \
-                #    module_ready['normalizer'] and \
-                #    module_ready['classifier']:
-                #     module_ready['system'] = True
-                #     print('System ready!')
-                # else:
-                #     module_ready['system'] = False
