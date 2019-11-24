@@ -3,7 +3,7 @@ from multiprocessing import Queue
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from App.Modules.NormalizerAdapter import NormalizerAdapter
-from App.Modules.DetectorAdapter import DetectorAdapterMockup
+from App.Modules.DetectorAdapter import DetectorAdapter
 from App.Modules.ClassifierAdapter import ClassifierAdapter
 import json
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     task_queue = Queue()
     settings['master_queue'] = task_queue
 
-    detector = DetectorAdapterMockup(settings)
+    detector = DetectorAdapter(settings)
     normalizer = NormalizerAdapter(settings)
     classifier = ClassifierAdapter(settings)
 
@@ -53,6 +53,9 @@ if __name__ == "__main__":
 
                 elif message == "sign_classified":
                     app.on_letter_classified(payload)
+
+                elif message == "video_frame":
+                    app.on_new_frame(payload)
 
             else:
                 if message == "detector_ready":

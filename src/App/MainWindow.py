@@ -46,6 +46,10 @@ class MainWindow(tk.Tk):
         video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
                                        row=1, column=0, rowspan=2)
 
+        self.video_feed = tk.Label(video_feed_f)
+        self.video_feed.pack(expand=True, fill='both')
+        
+
         hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
                                       row=1, column=1)
 
@@ -80,10 +84,16 @@ class MainWindow(tk.Tk):
         if True:  # If success:
             self.on_new_frame(frame)
 
-    def on_new_frame(self, frame):
+    def on_new_frame(self, video_frame):
         # TODO: Mateusz
         # Znajdz reke w klatce i wczytaj do HAND VIEW
         # Prefferably na osobnym wątku
+        size = (self.video_feed.winfo_width(), self.video_feed.winfo_height())
+        video_frame = video_frame.resize(size=size)
+
+        img = ImageTk.PhotoImage(video_frame)
+        self.video_feed.configure(image=img)
+        self.video_feed.image = img
 
         if True:  # If hand_detected:
             pass
