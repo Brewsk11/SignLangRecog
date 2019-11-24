@@ -21,33 +21,40 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
     # add .compat.v1. fragment to work with newer tensorflow
     sess = tf.compat.v1.Session(graph=detection_graph)
     blank_image = np.zeros(shape=[512, 512, 3], dtype=np.uint8)
+
+    output_q.put("co_worker loaded")
+
     while True:
         box_image = None
         # print("> ===== in worker loop, frame ", frame_processed)
-        frame = input_q.get()
-        if frame is not None:
-            # Actual detection. Variable boxes contains the bounding box cordinates for hands detected,
-            # while scores contains the confidence for each of these boxes.
-            # Hint: If len(boxes) > 1 , you may assume you have found atleast one hand (within your score threshold)
+        try: 
+            frame = input_q.get()
+            if frame is not None:
+                # Actual detection. Variable boxes contains the bounding box cordinates for hands detected,
+                # while scores contains the confidence for each of these boxes.
+                # Hint: If len(boxes) > 1 , you may assume you have found atleast one hand (within your score threshold)
 
-            boxes, scores = detector_utils.detect_objects(
-                frame, detection_graph, sess)
-            # draw bounding boxes
-            box_image = detector_utils.draw_box_on_image(
-                cap_params['num_hands_detect'], cap_params["score_thresh"],
-                scores, boxes, cap_params['im_width'], cap_params['im_height'],
-                frame)
-            # add frame annotated with bounding box to queue
-            output_q.put(frame)
-            frame_processed += 1
+                boxes, scores = detector_utils.detect_objects(
+                    frame, detection_graph, sess)
+                # draw bounding boxes
+                box_image = detector_utils.draw_box_on_image(
+                    cap_params['num_hands_detect'], cap_params["score_thresh"],
+                    scores, boxes, cap_params['im_width'], cap_params['im_height'],
+                    frame)
+                # add frame annotated with bounding box to queue
+                output_q.put(frame)
+                frame_processed += 1
 
-        else:
-            output_q.put(frame)
+            else:
+                output_q.put(frame)
 
-        if box_image is not None and box_image.size != 0:
-            box_q.put(box_image)
-        # else:
-        #     box_q.put(blank_image)
+            if box_image is not None and box_image.size != 0:
+                box_q.put(box_image)
+            # else:
+            #     box_q.put(blank_image)
+        except:
+            print("There is no new frame")
+            pass
     sess.close()
 
 
@@ -58,8 +65,6 @@ class DetectorAdapter:
         self.settings: dict = settings
 
         self._message_queue: multiprocessing.Queue = settings['master_queue']
-
-        self._message_queue.put(('detector_ready', None))
 
         args = {"width": width, "height": height, "num_workers": num_workers, "fps": fps, "queue_size": queue_size,
                 "video_source": video_source, "num_hands": num_hands}
@@ -84,6 +89,13 @@ class DetectorAdapter:
         self.pool = multiprocessing.Pool(args["num_workers"], co_worker,
                                          (self.input_q, self.output_q, self.box_q, cap_params, frame_processed))
 
+        num_workers_loaded = 0
+        while num_workers_loaded != num_workers:
+            if not self.output_q.empty():
+                message = self.output_q.get()
+                if(message == "co_worker loaded"):
+                    num_workers_loaded += 1
+
         self.start_time = datetime.datetime.now()
         self.num_frames = 0
         self.fps = 0
@@ -96,6 +108,7 @@ class DetectorAdapter:
         Thread(target=self.update, args=(self._message_queue,)).start()
 
     def update(self, queue: multiprocessing.Queue):
+        queue.put(("detector_ready", None))
         while True:
             if self.stopped:
                 print("Detector stop")
