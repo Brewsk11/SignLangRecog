@@ -5,6 +5,7 @@ import keras
 import numpy as np
 from PIL.Image import Image as PILImage
 
+import matplotlib.pyplot as plt
 
 class NormalizerAdapter:
     tensor_size = (128, 128)
@@ -31,7 +32,11 @@ class NormalizerAdapter:
             hand_photo = self._prediction_queue.get(block=True)
 
             tsr_img = self.image_to_tensor(hand_photo)
-            tsr_arr = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
+            tsr_arr: np.ndarray = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
+
+            tsr_arr = tsr_arr.astype('float32')
+            tsr_arr -= tsr_arr.min()
+            tsr_arr /= tsr_arr.max()
 
             t0 = time.clock()
             pred = model.predict(tsr_arr)
