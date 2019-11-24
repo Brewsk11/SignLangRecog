@@ -25,6 +25,8 @@ class NormalizerAdapter:
 
         model: keras.Model = keras.models.load_model(self.model_path)
 
+        self._master_queue.put(('normalizer_ready', None))
+
         while True:
             hand_photo = self._prediction_queue.get(block=True)
 

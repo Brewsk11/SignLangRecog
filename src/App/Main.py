@@ -21,10 +21,17 @@ if __name__ == "__main__":
     settings['master_queue'] = task_queue
 
     detector = DetectorAdapter(settings)
-    normalizer = NormalizerAdapter(settings)
+    # normalizer = NormalizerAdapter(settings)
     # classifier = ClassifierAdapter(settings)
 
-    app = MainWindow(task_queue)
+    app = MainWindow()
+
+    module_ready = {
+        'detector': False,
+        'normalizer': False,
+        'classifier': False,
+        'system': False
+    }
 
     while True:
         app.update_idletasks()
@@ -35,16 +42,39 @@ if __name__ == "__main__":
             message, payload = task_queue.get(block=False)
             print("Oh, got a message!: " + message)
 
-            if message == "hand_detected":
-                app.on_hand_detected(payload)
-                normalizer.normalize(payload)
+            if module_ready['system']:
+                if message == "hand_detected":
+                    app.on_hand_detected(payload)
+                    # normalizer.normalize(payload)
 
-            elif message == "video_frame":
-                app.on_new_frame(payload)
+                elif message == "hand_normalized":
+                    app.on_hand_normalized(payload)
+                    classifier.classify(payload)
 
-            # elif message == "hand_normalized":
-            #     app.on_hand_normalized(payload)
-            #     classifier.classify(payload)
+                elif message == "sign_classified":
+                    app.on_letter_classified(payload)
 
-            # elif message == "sign_classified":
-            #     app.on_letter_classified(payload)
+                elif message == "video_frame":
+                    app.on_new_frame(payload)
+
+            else:
+                if message == "detector_ready":
+                    module_ready['detector'] = True
+                # elif message == "normalizer_ready":
+                #     module_ready['normalizer'] = True
+                # elif message == "classifier_ready":
+                #     module_ready['classifier'] = True
+
+                if module_ready['detector']:
+                    module_ready['system'] = True
+                    print('System ready!')
+                else:
+                    module_ready['system'] = False
+
+                # if module_ready['detector'] and \
+                #    module_ready['normalizer'] and \
+                #    module_ready['classifier']:
+                #     module_ready['system'] = True
+                #     print('System ready!')
+                # else:
+                #     module_ready['system'] = False

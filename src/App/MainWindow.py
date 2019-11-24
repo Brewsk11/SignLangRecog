@@ -1,13 +1,16 @@
 import tkinter as tk
 import numpy as np
 from PIL import ImageTk, Image
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 
 class MainWindow(tk.Tk):
 
-    def __init__(self, message_queue, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.init_layout()
 
@@ -61,8 +64,13 @@ class MainWindow(tk.Tk):
         self.normalized_view['background'] = 'blue'
         self.normalized_view.pack(expand=True, fill='both')
 
-        self.prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
+        prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                        row=1, column=2, rowspan=2)
+
+        f = Figure(figsize=(2, 3), dpi=72)
+        self.prediction_info_axe = f.add_subplot(111)
+        self.prediction_info = FigureCanvasTkAgg(f, master=prediction_info_f)
+        self.prediction_info.get_tk_widget().pack(expand=True, fill='both')
 
         # 3rd row
         application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
@@ -130,12 +138,13 @@ class MainWindow(tk.Tk):
         pred_list = pred_list.flatten()
         classified_letter = labels[pred_list.argmax()]
         print("Damn Daniel, I have just predicted the letter: " + classified_letter)
-        index = np.arange(len(labels))
-        plt.barh(index, pred_list)
-        plt.yticks(index, labels)
-        plt.show()
-        canvas = FigureCanvasTkAgg(plot, master=self.prediction_info_f)
-        canvas.show()
-        canvas.get_tk_widget().pack()
-        plt.show()
 
+        # Drawing
+        # call the clear method on your axes
+        self.prediction_info_axe.clear()
+
+        index = np.arange(len(labels))
+        self.prediction_info_axe.barh(index, pred_list)
+
+        # call the draw method on your canvas
+        self.prediction_info.draw()

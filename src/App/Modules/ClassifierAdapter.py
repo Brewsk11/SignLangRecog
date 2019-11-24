@@ -10,8 +10,10 @@ class ClassifierAdapter:
         self.model: keras.Model = keras.models.load_model(self.model_path)
         self.correct_shape = (128, 128)
 
+        self._master_queue.put(('classifier_ready', None))
+
     def classify(self, input_tensor: np.ndarray):
-        if (input_tensor.shape != self.correct_shape):
+        if input_tensor.shape != self.correct_shape:
             raise RuntimeError("Wrong tensor shape!")
 
         input_tensor = input_tensor.reshape(1, 128, 128, 1)

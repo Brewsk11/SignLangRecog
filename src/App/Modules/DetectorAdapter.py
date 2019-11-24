@@ -1,15 +1,15 @@
-from Modules.Detector.utils import detector_utils as detector_utils
 import cv2
 import tensorflow as tf
 import multiprocessing
 import queue
 import time
-from Modules.Detector.utils.detector_utils import WebcamVideoStream
 import datetime
-import argparse
 from threading import Thread
 import numpy as np
 from PIL import ImageTk, Image
+
+from Modules.Detector.utils.detector_utils import WebcamVideoStream
+from Modules.Detector.utils import detector_utils as detector_utils
 
 def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
@@ -17,11 +17,12 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
     # add .compat.v1. fragment to work with newer tensorflow
     sess = tf.compat.v1.Session(graph=detection_graph)
     blank_image = np.zeros(shape=[512, 512, 3], dtype=np.uint8)
+
     while True:
         box_image = None
-        #print("> ===== in worker loop, frame ", frame_processed)
+        # print("> ===== in worker loop, frame ", frame_processed)
         frame = input_q.get()
-        if (frame is not None):
+        if frame is not None:
             # Actual detection. Variable boxes contains the bounding box cordinates for hands detected,
             # while scores contains the confidence for each of these boxes.
             # Hint: If len(boxes) > 1 , you may assume you have found atleast one hand (within your score threshold)
@@ -44,14 +45,22 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
             box_q.put(box_image)
         # else:
         #     box_q.put(blank_image)
+
     sess.close()
+
 
 class DetectorAdapter:
 
-    def __init__(self, settings, score_thresh=0.5, width=300, height=200, num_workers=2, fps=1, queue_size=5, video_source=0, num_hands=1,):
+    def __init__(self, settings, score_thresh=0.5, width=300, height=200, num_workers=2, fps=1, queue_size=5,
+                 video_source=0, num_hands=1, ):
         self.settings: dict = settings
-        self._message_queue = settings['master_queue']
-        args = {"width": width, "height": height, "num_workers": num_workers, "fps": fps, "queue_size": queue_size, "video_source": video_source, "num_hands": num_hands}
+
+        self._message_queue: multiprocessing.Queue = settings['master_queue']
+
+        self._message_queue.put(('detector_ready', None))
+
+        args = {"width": width, "height": height, "num_workers": num_workers, "fps": fps, "queue_size": queue_size,
+                "video_source": video_source, "num_hands": num_hands}
         self.input_q = multiprocessing.Queue(maxsize=args["queue_size"])
         self.output_q = multiprocessing.Queue(maxsize=args["queue_size"])
         self.box_q = multiprocessing.Queue(maxsize=args["queue_size"])
@@ -71,7 +80,7 @@ class DetectorAdapter:
 
         # spin up workers to paralleize detection.
         self.pool = multiprocessing.Pool(args["num_workers"], co_worker,
-                    (self.input_q, self.output_q, self.box_q, cap_params, frame_processed))
+                                         (self.input_q, self.output_q, self.box_q, cap_params, frame_processed))
 
         self.start_time = datetime.datetime.now()
         self.num_frames = 0
