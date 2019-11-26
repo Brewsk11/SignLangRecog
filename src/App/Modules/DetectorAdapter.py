@@ -11,6 +11,17 @@ from PIL import ImageTk, Image
 from Modules.Detector.utils.detector_utils import WebcamVideoStream
 from Modules.Detector.utils import detector_utils as detector_utils
 
+import time
+
+class TimeFrame:
+    def __init__(self, img, timestamp):
+        self.img = img
+        self.timestamp = timestamp
+        self.detector_time = None
+        self.normalizer_time = None
+        self.classifier_time = None
+
+
 def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
     detection_graph, sess = detector_utils.load_inference_graph()
@@ -25,27 +36,28 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
         # print("> ===== in worker loop, frame ", frame_processed)
         try: 
             frame = input_q.get()
-            if frame is not None:
+            if frame.img is not None:
                 # Actual detection. Variable boxes contains the bounding box cordinates for hands detected,
                 # while scores contains the confidence for each of these boxes.
                 # Hint: If len(boxes) > 1 , you may assume you have found atleast one hand (within your score threshold)
 
                 boxes, scores = detector_utils.detect_objects(
-                    frame, detection_graph, sess)
+                    frame.img, detection_graph, sess)
                 # draw bounding boxes
                 box_image = detector_utils.draw_box_on_image(
                     cap_params['num_hands_detect'], cap_params["score_thresh"],
                     scores, boxes, cap_params['im_width'], cap_params['im_height'],
-                    frame)
+                    frame.img)
                 # add frame annotated with bounding box to queue
                 output_q.put(frame)
                 frame_processed += 1
+                box_time = TimeFrame(box_image,frame.timestamp)
 
             else:
                 output_q.put(frame)
 
             if box_image is not None and box_image.size != 0:
-                box_q.put(box_image)
+                box_q.put(box_time)
             # else:
             #     box_q.put(blank_image)
         except:
@@ -110,30 +122,34 @@ class DetectorAdapter:
                 print("Detector stop")
                 return
             try:
-                frame = self.video_capture.read()
-                frame = cv2.flip(frame, 1)
+                frame = TimeFrame(self.video_capture.read(), time.time())
+                frame.img = cv2.flip(frame.img, 1)
                 self.index += 1
             except:
                 self.except_table.append("video read exception")
-                frame = self.blank_image
+                # frame = self.blank_image
 
             try:
-                self.input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                frame.img = cv2.cvtColor(frame.img, cv2.COLOR_BGR2RGB)
+                self.input_q.put(frame)
                 output_frame = self.output_q.get()
 
-                pil_frame = Image.fromarray(output_frame)
+                pil_frame = Image.fromarray(output_frame.img)
                 message = (
                     "video_frame",
                     pil_frame
                 )
                 queue.put(message)
+
             except:
                 self.except_table.append("Queue excpetion")
                 output_frame = self.blank_image
             
             try:
                 self.box_image = self.box_q.get(False)
-                pil_hand = Image.fromarray(self.box_image)
+                # pil_hand = cv2.cvtColor(self.box_image, cv2.COLOR_RGB2BGR)
+                self.box_image.img = Image.fromarray(self.box_image.img)
+                pil_hand = self.box_image
 
                 message = (
                     "hand_detected",
@@ -144,10 +160,10 @@ class DetectorAdapter:
                 self.except_table.append("No image in box queue")
                 
 
-            try:
-                output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
-            except:
-                self.except_table.append("cvtColor exception")
+            # try:
+            #     output_frame = cv2.cvtColor(output_frame, cv2.COLOR_RGB2BGR)
+            # except:
+            #     self.except_table.append("cvtColor exception")
 
             try:
                 self.elapsed_time = (datetime.datetime.now() - self.start_time).total_seconds()

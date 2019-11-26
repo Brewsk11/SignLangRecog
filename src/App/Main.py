@@ -7,6 +7,8 @@ from Modules.DetectorAdapter import DetectorAdapter
 from Modules.ClassifierAdapter import ClassifierAdapter
 import json
 
+import time
+
 settings_path = './settings.json'
 
 if __name__ == "__main__":
@@ -33,6 +35,8 @@ if __name__ == "__main__":
         'system': False
     }
 
+    f = open("..//Tests//modules_time2.txt", "a+")
+    f.write("start_time detector_time normalizer_time classifier_time\n")
     while True:
         app.update_idletasks()
         app.update()
@@ -44,15 +48,19 @@ if __name__ == "__main__":
 
             if module_ready['system']:
                 if message == "hand_detected":
-                    app.on_hand_detected(payload)
+                    payload.detector_time = time.time()
+                    app.on_hand_detected(payload.img)
                     normalizer.normalize(payload)
 
                 elif message == "hand_normalized":
-                    app.on_hand_normalized(payload)
+                    payload.normalizer_time = time.time()
+                    app.on_hand_normalized(payload.img)
                     classifier.classify(payload)
 
                 elif message == "sign_classified":
-                    app.on_letter_classified(payload)
+                    payload.classifier_time = time.time()
+                    app.on_letter_classified(payload.img)
+                    f.write(str(payload.timestamp)+" "+str(payload.detector_time)+" "+str(payload.normalizer_time)+" "+str(payload.classifier_time)+"\n")
 
                 elif message == "video_frame":
                     app.on_new_frame(payload)

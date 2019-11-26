@@ -5,6 +5,7 @@ import numpy as np
 from pickle import load
 import random
 import time
+from threading import Thread
 
 class ClassifierAdapter:
 
@@ -16,16 +17,18 @@ class ClassifierAdapter:
 
         self._master_queue.put(('classifier_ready', None))
 
-    def classify(self, input_tensor: np.ndarray):
+    def classify(self, input_tensor_time: np.ndarray):
+        input_tensor = input_tensor_time.img
         if input_tensor.shape != self.correct_shape:
             raise RuntimeError("Wrong tensor shape!")
 
         input_tensor = input_tensor.reshape(1, 128, 128, 1)
         prediction = self.model.predict(input_tensor)
 
+        input_tensor_time.img = prediction
         message = (
             'sign_classified',
-            prediction
+            input_tensor_time
         )
 
         self._master_queue.put(message)
@@ -36,7 +39,7 @@ class ClassifierAdapterMockup(ClassifierAdapter):
         super().__init__(settings)
         self.images_tensor_path = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/mockup_tensor.tsr'
 
-        loop_process = multiprocessing.Process(target=self.module_loop, args=(self._master_queue,))
+        loop_process = multiprocessing.Thread(target=self.module_loop, args=(self._master_queue,))
         loop_process.start()
 
     def module_loop(self, queue: Queue):

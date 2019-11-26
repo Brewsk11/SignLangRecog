@@ -9,7 +9,7 @@ if __name__ == '__main__':
 
     cv2.namedWindow('Multi-Threaded Detection', cv2.WINDOW_NORMAL)
     cv2.namedWindow('Box', cv2.WINDOW_NORMAL)
-    detector = detect_multi_threaded.Detector(score_thresh).start()
+    detector = detect_multi_threaded.DetectorAdapter(score_thresh)
 
     try:
         while True:

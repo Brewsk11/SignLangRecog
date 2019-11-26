@@ -4,6 +4,7 @@ from multiprocessing import Queue, Process
 import keras
 import numpy as np
 from PIL.Image import Image as PILImage
+from threading import Thread
 
 import matplotlib.pyplot as plt
 
@@ -16,7 +17,7 @@ class NormalizerAdapter:
 
         self._prediction_queue = Queue()
 
-        normalizer_process = Process(target=self.normalizer_worker)
+        normalizer_process = Thread(target=self.normalizer_worker)
         normalizer_process.start()
 
     def normalize(self, hand_photo: PILImage):
@@ -29,8 +30,9 @@ class NormalizerAdapter:
         self._master_queue.put(('normalizer_ready', None))
 
         while True:
-            hand_photo = self._prediction_queue.get(block=True)
+            hand_photo_time = self._prediction_queue.get(block=True)
 
+            hand_photo = hand_photo_time.img
             tsr_img = self.image_to_tensor(hand_photo)
             tsr_arr: np.ndarray = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
 
@@ -45,10 +47,10 @@ class NormalizerAdapter:
             print(f"Prediction complete in {elapsed}")
 
             pred = pred.reshape((128, 128))
-
+            hand_photo_time.img = pred
             message = (
                 'hand_normalized',
-                pred
+                hand_photo_time
             )
 
             self._master_queue.put(message)
