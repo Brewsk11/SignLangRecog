@@ -12,14 +12,15 @@ from Modules.Detector.utils.detector_utils import WebcamVideoStream
 from Modules.Detector.utils import detector_utils as detector_utils
 
 import time
+import os
+
+test_dataset = "C:\\Users\\Admin\\Desktop\\handtracking-master\\SignLangRecog\\src\\Tests\\test_dataset\\"
 
 class TimeFrame:
-    def __init__(self, img, timestamp):
+    def __init__(self, img, letter):
         self.img = img
-        self.timestamp = timestamp
-        self.detector_time = None
-        self.normalizer_time = None
-        self.classifier_time = None
+        self.letter = letter
+        self.detect = None
 
 
 def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
@@ -49,15 +50,20 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
                     scores, boxes, cap_params['im_width'], cap_params['im_height'],
                     frame.img)
                 # add frame annotated with bounding box to queue
+
+                if box_image is not None and box_image.size != 0:
+                    frame.detect = 1
+                else:
+                    frame.detect = 0
                 output_q.put(frame)
                 frame_processed += 1
-                box_time = TimeFrame(box_image,frame.timestamp)
+                # box_time = TimeFrame(box_image, frame.letter)
 
             else:
                 output_q.put(frame)
 
-            if box_image is not None and box_image.size != 0:
-                box_q.put(box_time)
+            # if box_image is not None and box_image.size != 0:
+                # box_q.put(box_image)
             # else:
             #     box_q.put(blank_image)
         except:
@@ -104,6 +110,16 @@ class DetectorAdapter:
                 if(message == "co_worker loaded"):
                     num_workers_loaded += 1
 
+        self.image_buffer = []
+        for r, d, f in os.walk(test_dataset):
+            for file in f:
+                if "space" in file:
+                    letter = "space"
+                else:
+                    letter = file[0]
+                name = file
+                self.image_buffer.append(TimeFrame(name, letter))
+
         self.start_time = datetime.datetime.now()
         self.num_frames = 0
         self.fps = 0
@@ -122,42 +138,49 @@ class DetectorAdapter:
                 print("Detector stop")
                 return
             try:
-                frame = TimeFrame(self.video_capture.read(), time.time())
-                frame.img = cv2.flip(frame.img, 1)
+                # frame = TimeFrame(self.video_capture.read(), time.time())
+                # frame.img = cv2.flip(frame.img, 1)
+                if(len(self.image_buffer) > 0):
+                    frame = self.image_buffer[0]
+                    del self.image_buffer[0]
+                else:
+                    self.stop()
+
                 self.index += 1
             except:
                 self.except_table.append("video read exception")
                 # frame = self.blank_image
 
             try:
+                frame.img = cv2.imread(test_dataset+frame.letter+"\\"+frame.img)
                 frame.img = cv2.cvtColor(frame.img, cv2.COLOR_BGR2RGB)
                 self.input_q.put(frame)
                 output_frame = self.output_q.get()
 
-                pil_frame = Image.fromarray(output_frame.img)
+                output_frame.img = Image.fromarray(output_frame.img)
                 message = (
                     "video_frame",
-                    pil_frame
+                    output_frame
                 )
                 queue.put(message)
 
             except:
                 self.except_table.append("Queue excpetion")
                 output_frame = self.blank_image
-            
-            try:
-                self.box_image = self.box_q.get(False)
-                # pil_hand = cv2.cvtColor(self.box_image, cv2.COLOR_RGB2BGR)
-                self.box_image.img = Image.fromarray(self.box_image.img)
-                pil_hand = self.box_image
-
-                message = (
-                    "hand_detected",
-                    pil_hand
-                )
-                queue.put(message)
-            except:
-                self.except_table.append("No image in box queue")
+            #
+            # try:
+            #     self.box_image = self.box_q.get(False)
+            #     # pil_hand = cv2.cvtColor(self.box_image, cv2.COLOR_RGB2BGR)
+            #     self.box_image.img = Image.fromarray(self.box_image.img)
+            #     pil_hand = self.box_image
+            #
+            #     message = (
+            #         "hand_detected",
+            #         pil_hand
+            #     )
+            #     queue.put(message)
+            # except:
+            #     self.except_table.append("No image in box queue")
                 
 
             # try:

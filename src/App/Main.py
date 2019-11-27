@@ -23,8 +23,8 @@ if __name__ == "__main__":
     settings['master_queue'] = task_queue
 
     detector = DetectorAdapter(settings)
-    normalizer = NormalizerAdapter(settings)
-    classifier = ClassifierAdapter(settings)
+    # normalizer = NormalizerAdapter(settings)
+    # classifier = ClassifierAdapter(settings)
 
     app = MainWindow()
 
@@ -35,8 +35,9 @@ if __name__ == "__main__":
         'system': False
     }
 
-    f = open("..//Tests//modules_time2.txt", "a+")
-    f.write("start_time detector_time normalizer_time classifier_time\n")
+    f = open("..//Tests//hand_detect.txt", "a+")
+    f.write("letter detect\n")
+    tmp=0
     while True:
         app.update_idletasks()
         app.update()
@@ -44,38 +45,39 @@ if __name__ == "__main__":
         while not task_queue.empty():
 
             message, payload = task_queue.get(block=False)
-            print("Oh, got a message!: " + message)
+            print("Oh, got a message "+str(tmp)+"!:" + message)
+            tmp+=1
 
             if module_ready['system']:
-                if message == "hand_detected":
-                    payload.detector_time = time.time()
-                    app.on_hand_detected(payload.img)
-                    normalizer.normalize(payload)
+                # if message == "hand_detected":
+                #     payload.detector_time = time.time()
+                #     app.on_hand_detected(payload.img)
+                #     normalizer.normalize(payload)
+                #
+                # elif message == "hand_normalized":
+                #     payload.normalizer_time = time.time()
+                #     app.on_hand_normalized(payload.img)
+                #     classifier.classify(payload)
+                #
+                # elif message == "sign_classified":
+                #     payload.classifier_time = time.time()
+                #     app.on_letter_classified(payload.img)
 
-                elif message == "hand_normalized":
-                    payload.normalizer_time = time.time()
-                    app.on_hand_normalized(payload.img)
-                    classifier.classify(payload)
-
-                elif message == "sign_classified":
-                    payload.classifier_time = time.time()
-                    app.on_letter_classified(payload.img)
-                    f.write(str(payload.timestamp)+" "+str(payload.detector_time)+" "+str(payload.normalizer_time)+" "+str(payload.classifier_time)+"\n")
-
-                elif message == "video_frame":
-                    app.on_new_frame(payload)
+                if message == "video_frame":
+                    f.write(payload.letter+" "+str(payload.detect)+"\n")
+                    app.on_new_frame(payload.img)
 
             else:
                 if message == "detector_ready":
                     module_ready['detector'] = True
-                elif message == "normalizer_ready":
-                    module_ready['normalizer'] = True
-                elif message == "classifier_ready":
-                    module_ready['classifier'] = True
+                # elif message == "normalizer_ready":
+                #     module_ready['normalizer'] = True
+                # elif message == "classifier_ready":
+                #     module_ready['classifier'] = True
 
-                if module_ready['detector'] and \
-                   module_ready['normalizer'] and \
-                   module_ready['classifier']:
+                if module_ready['detector']:# and \
+                   # module_ready['normalizer'] and \
+                   # module_ready['classifier']:
                     module_ready['system'] = True
                     print('System ready!')
                 else:
