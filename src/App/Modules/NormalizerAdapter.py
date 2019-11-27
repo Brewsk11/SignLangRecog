@@ -46,6 +46,8 @@ class NormalizerAdapter:
 
             pred = pred.reshape((128, 128))
 
+            pred /= pred.max()
+
             message = (
                 'hand_normalized',
                 pred
