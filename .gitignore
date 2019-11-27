@@ -206,3 +206,4 @@ settings.json
 MockupHandImages/
 *.pb
 *.pbtxt
+src/Tests/test_dataset/
