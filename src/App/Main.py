@@ -20,6 +20,9 @@ if __name__ == "__main__":
     task_queue = Queue()
     settings['master_queue'] = task_queue
 
+    video_feed_queue = Queue(maxsize=3)
+    settings['video_feed_queue'] = video_feed_queue
+
     detector = DetectorAdapter(settings)
     normalizer = NormalizerAdapter(settings)
     classifier = ClassifierAdapter(settings)
@@ -39,6 +42,15 @@ if __name__ == "__main__":
 
         app.set_status(module_ready)
 
+        if not video_feed_queue.empty():
+            message, payload = video_feed_queue.get(block=False)
+
+            if message == "video_frame":
+                app.on_new_frame(payload)
+
+
+        overload_counter = 3
+
         while not task_queue.empty():
 
             message, payload = task_queue.get(block=False)
@@ -55,9 +67,6 @@ if __name__ == "__main__":
 
                 elif message == "sign_classified":
                     app.on_letter_classified(payload)
-
-                elif message == "video_frame":
-                    app.on_new_frame(payload)
 
             else:
                 if message == "detector_ready":
@@ -76,3 +85,7 @@ if __name__ == "__main__":
                     module_ready['system'] = False
 
                 app.set_status(module_ready)
+
+            overload_counter -= 1
+            if overload_counter == 0:
+                break
