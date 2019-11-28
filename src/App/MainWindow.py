@@ -19,6 +19,8 @@ class MainWindow(tk.Tk):
 
 
     def init_layout(self):
+        self.winfo_toplevel().title("Sign Language Recognizer")
+
         unit_size = self.settings['gui_settings']['unit_size']
 
         def units(x):
