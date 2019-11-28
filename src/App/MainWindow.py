@@ -13,7 +13,10 @@ class MainWindow(tk.Tk):
     def __init__(self, settings, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.settings = settings
+        self.letter_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                              'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         self.init_layout()
+
 
     def init_layout(self):
         unit_size = self.settings['gui_settings']['unit_size']
@@ -68,15 +71,9 @@ class MainWindow(tk.Tk):
         prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                        row=1, column=2, rowspan=2)
 
-        xlabels = [str(i*10) + '%' for i in range(11)]
-        ylabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-                  'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         f = Figure(figsize=(2, 3), dpi=72)
         self.prediction_info_axe = f.add_subplot(111)
-        self.prediction_info_axe.set_xticks(np.arange(len(xlabels)))
-        self.prediction_info_axe.set_xticklabels(xlabels)
-        self.prediction_info_axe.set_yticks(np.arange(len(ylabels)+1))
-        self.prediction_info_axe.set_yticklabels(ylabels)
+        self.setup_pred_axes()
         self.prediction_info = FigureCanvasTkAgg(f, master=prediction_info_f)
         self.prediction_info.get_tk_widget().pack(expand=True, fill='both')
 
@@ -144,19 +141,17 @@ class MainWindow(tk.Tk):
         self.normalized_view.image = img
 
     def on_letter_classified(self, pred_list: np.ndarray):
-        labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-                  'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
         pred_list = pred_list.flatten()
-        classified_letter = labels[pred_list.argmax()]
+        classified_letter = self.letter_labels[pred_list.argmax()]
         print("Damn Daniel, I have just predicted the letter: " + classified_letter)
 
         # Drawing
         # call the clear method on your axes
         self.prediction_info_axe.clear()
 
-        index = np.arange(len(labels))
+        index = np.arange(len(self.letter_labels))
         self.prediction_info_axe.barh(index, pred_list)
+        self.setup_pred_axes()
         
 
         # call the draw method on your canvas
@@ -179,3 +174,15 @@ class MainWindow(tk.Tk):
             self.app_info['fg'] = 'darkgreen'
 
         self.app_info['text'] = status_str
+
+    def setup_pred_axes(self):
+        xlabels = [str(i*10) + '%' for i in range(0, 11, 2)]
+        ylabels = self.letter_labels
+        self.prediction_info_axe.set_xticks(np.arange(len(xlabels)))
+        self.prediction_info_axe.set_xticklabels(xlabels)
+        self.prediction_info_axe.set_yticks(np.arange(len(ylabels)+1))
+        self.prediction_info_axe.set_yticklabels(ylabels, fontsize='8')
+        for i in range(1, 5):
+            self.prediction_info_axe.axvline(x=i, ymin=0, ymax=1, color='whitesmoke')
+
+
