@@ -27,7 +27,7 @@ class ClassifierAdapter:
 
     def classifier_worker(self):
         model: keras.Model = keras.models.load_model(self.model_path)
-        self._master_queue.put('classifier_ready', None)
+        self._master_queue.put(('classifier_ready', None))
 
         while True:
             input_tensor = self._prediction_queue.get()
@@ -36,7 +36,7 @@ class ClassifierAdapter:
 
             input_tensor /= input_tensor.max()
             input_tensor = input_tensor.reshape(1, 128, 128, 1)
-            prediction = self.model.predict(input_tensor)
+            prediction = model.predict(input_tensor)
 
             message = (
                 'sign_classified',
