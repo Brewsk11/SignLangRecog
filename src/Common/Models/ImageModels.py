@@ -55,7 +55,10 @@ class ImageAbstr:
                                  + self._filename_pattern)
 
         # Set letter
-        self._letter = var[0]
+        if(platform.system() is 'Windows'):
+            self._letter = filepath.rsplit('\\', 2)[1]
+        else:
+            self._letter = var[0]
         var = var[1:]
 
         # Set extension

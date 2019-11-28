@@ -7,8 +7,8 @@ import keras
 from keras.optimizers import *
 from keras.callbacks import *
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
-models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/Refactor/'
+models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/Refactor/'
 images_tensor_name = 'train_images.tsr'
 letters_tensor_name = 'train_letters.tsr'
 res = 128

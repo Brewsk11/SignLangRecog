@@ -6,12 +6,12 @@ from Common.Models.TensorBuilder import TensorBuilder
 from Common.Models.ImageModels import TaggedImage
 from Classifier.Models.LettersTensorBuilder import LettersTensorBuilder
 
-generate_new_or_connect = False
+generate_new_or_connect = True
 res = 128
 seed = 69
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
-tagged_data_dir = 'LiterkiTrain1'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/Refactor/'
+tagged_data_dir = 'LiterkiTest'
 tagged_data_dir2 = 'LiterkiTrain2'
 tagged_data_path = 'C:/Users/jakub/Desktop/Inzynierka/' + tagged_data_dir + '/'
 tagged_data_path2 = 'C:/Users/jakub/Desktop/Inzynierka/' + tagged_data_dir2 + '/'

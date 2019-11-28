@@ -5,16 +5,16 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 import itertools
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/Refactor/'
 models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
-images_tensor_name = 'test_images.tsr'
-letters_tensor_name = 'test_letters.tsr'
+images_tensor_name = 'LiterkiTest_images.tsr'
+letters_tensor_name = 'LiterkiTest_letters.tsr'
 res = 128
 train_validation_ratio = 0.9
 test_num = 100
 
-history_file = 'b2404_ClassifierModel_history.p'
-model_file = 'b2404_ClassifierModel_e040'
+history_file = 'ee628_ClassifierModel2_history.p'
+model_file = 'ee628_ClassifierModel2_e100'
 model_path = models_dir + model_file
 
 def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
@@ -72,10 +72,10 @@ if __name__ == "__main__":
     plt.ylabel('loss')
     plt.show()
 
-    with open(tensors_dir + 'test_images.tsr', 'rb') as images_file:
+    with open(tensors_dir + images_tensor_name, 'rb') as images_file:
         test_images = load(images_file)
 
-    with open(tensors_dir + 'test_letters.tsr', 'rb') as letters_file:
+    with open(tensors_dir + letters_tensor_name, 'rb') as letters_file:
         test_letters = load(letters_file)
 
     #prediction and create confusion matrix
