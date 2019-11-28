@@ -148,11 +148,7 @@ class MainWindow(tk.Tk):
         # Drawing
         # call the clear method on your axes
         self.prediction_info_axe.clear()
-
-        index = np.arange(len(self.letter_labels))
         self.setup_pred_axes(pred_list)
-        display_list = pred_list * 5
-        self.prediction_info_axe.barh(index, pred_list)
 
         # call the draw method on your canvas
         self.prediction_info.draw()
@@ -178,12 +174,20 @@ class MainWindow(tk.Tk):
     def setup_pred_axes(self, *args):
         xlabels = [str(i*10) + '%' for i in range(0, 11, 2)]
         ylabels = self.letter_labels
+        for i in range(1, 5):
+            self.prediction_info_axe.axvline(x=i, ymin=0, ymax=1, color='whitesmoke', alpha=0.3)
+
+        if len(args) > 0:
+            pred_list = args[0]
+            index = np.arange(len(self.letter_labels))
+            display_list = pred_list * 5
+            self.prediction_info_axe.barh(index, display_list)
+
         self.prediction_info_axe.set_xticks(np.arange(len(xlabels)))
         self.prediction_info_axe.set_xticklabels(xlabels)
-        self.prediction_info_axe.set_yticks(np.arange(len(ylabels)+1))
+        self.prediction_info_axe.set_yticks(np.arange(len(ylabels)))
         self.prediction_info_axe.set_yticklabels(ylabels, fontsize='8')
-        for i in range(1, 5):
-            self.prediction_info_axe.axvline(x=i, ymin=0, ymax=1, color='whitesmoke')
+
 
 
 
