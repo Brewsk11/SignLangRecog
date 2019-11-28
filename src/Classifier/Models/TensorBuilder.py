@@ -181,7 +181,7 @@ class TensorBuilder:
     def size(self, val: tuple) -> 'TensorBuilder':
         """Set whether to convert to grayscale when building tensor"""
         if self._tensor is not None:
-            raise RuntimeError('Setting size should happen before building tensor')
+            raise RuntimeError('Setting grayscale should happen before building tensor')
         self._shape = val
         return self
 

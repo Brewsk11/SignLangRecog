@@ -2,6 +2,8 @@ from PIL.Image import Image as PILImage, open as PILOpen, BICUBIC, BILINEAR, LAN
 from os.path import abspath
 import re as regex
 import platform
+import win32file
+
 
 
 class ImageAbstr:
@@ -49,14 +51,9 @@ class ImageAbstr:
             self._filename = str(var[1])
             var = self._filename
 
-        # Find out if the filename if compliant with tagged or training image naming conventions
-        if regex.match(filename_pattern, self._filename) is None:
-            raise AttributeError('Provided filename ' + self._filename + ' is not compliant with naming pattern'
-                                 + self._filename_pattern)
-
         # Set letter
-        self._letter = var[0]
-        var = var[1:]
+        temp = self._path
+        self._letter = temp.rsplit("\\")[6]
 
         # Set extension
         var = var.rsplit('.', 2)
@@ -136,14 +133,14 @@ class TaggedImage(ImageAbstr):
     image size and extension (ex. H1234_128.jpg, s4231_16.bmp).
     """
 
-    def __init__(self, filepath: str):
+    def __init__(self, filepath: str, resolution: int):
 
         self._resolution: int
 
         self._filename_pattern = "^[A-Zdns][0-9]{1,6}_[0-9]{1,3}\.(bmp|jpg)$"
         super().__init__(filepath, self._filename_pattern)
 
-        self._resolution = int(self.filename.rsplit('_', 1)[1].split('.')[0])
+        self._resolution = resolution
         if self._resolution != self.width and self._resolution !=  self.height:
             raise RuntimeError(f'Resolution specified in filename {self.filename}'
                                f'is not the same as image\'s width and height: ({self.width} {self.height}))')
