@@ -13,6 +13,7 @@ from Modules.Detector.utils import detector_utils as detector_utils
 
 import time
 import os
+from PIL import Image
 
 test_dataset = "C:\\Users\\Admin\\Desktop\\handtracking-master\\SignLangRecog\\src\\Tests\\test_dataset\\"
 
@@ -79,6 +80,7 @@ class DetectorAdapter:
         self.settings: dict = settings
 
         self._message_queue: multiprocessing.Queue = settings['master_queue']
+        self.system_ready = settings['system_ready']
 
         args = {"width": width, "height": height, "num_workers": num_workers, "fps": fps, "queue_size": queue_size,
                 "video_source": video_source, "num_hands": num_hands}
@@ -133,6 +135,11 @@ class DetectorAdapter:
 
     def update(self, queue: multiprocessing.Queue):
         queue.put(("detector_ready", None))
+
+        while self.system_ready.empty():
+            print("czekam")
+            time.sleep(2)
+
         while True:
             if self.stopped:
                 print("Detector stop")
@@ -152,15 +159,16 @@ class DetectorAdapter:
                 # frame = self.blank_image
 
             try:
-                frame.img = cv2.imread(test_dataset+frame.letter+"\\"+frame.img)
-                frame.img = cv2.cvtColor(frame.img, cv2.COLOR_BGR2RGB)
-                self.input_q.put(frame)
-                output_frame = self.output_q.get()
+                # time.sleep(2)
+                frame.img = Image.open(test_dataset+frame.letter+"\\"+frame.img)
+                # frame.img = cv2.cvtColor(frame.img, cv2.COLOR_BGR2RGB)
+                # self.input_q.put(frame)
+                # output_frame = self.output_q.get()
 
-                output_frame.img = Image.fromarray(output_frame.img)
+                # output_frame.img = Image.fromarray(output_frame.img)
                 message = (
-                    "video_frame",
-                    output_frame
+                    "hand_detected",
+                    frame
                 )
                 queue.put(message)
 
