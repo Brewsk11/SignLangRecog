@@ -76,6 +76,10 @@ class MainWindow(tk.Tk):
         application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
                                         row=3, column=0, columnspan=3)
 
+        self.app_info = tk.Label(application_info_f)
+        self.app_info['text'] = "Initializing"
+        self.app_info.pack(expand=True, fill='both')
+
     def load_new_frame(self, frame):
         # TODO: Mateusz
         # Wczytanie klatki do VIDEO FEED
@@ -148,3 +152,7 @@ class MainWindow(tk.Tk):
 
         # call the draw method on your canvas
         self.prediction_info.draw()
+
+    def set_status(self, status):
+
+        pass
