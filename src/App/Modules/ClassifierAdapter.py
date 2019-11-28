@@ -22,6 +22,7 @@ class ClassifierAdapter:
         if input_tensor.shape != self.correct_shape:
             raise RuntimeError("Wrong tensor shape!")
 
+        input_tensor /= input_tensor.max()
         input_tensor = input_tensor.reshape(1, 128, 128, 1)
         prediction = self.model.predict(input_tensor)
 

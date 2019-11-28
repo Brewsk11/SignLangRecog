@@ -47,7 +47,10 @@ class NormalizerAdapter:
             print(f"Prediction complete in {elapsed}")
 
             pred = pred.reshape((128, 128))
+            pred /= pred.max()
+
             hand_photo_time.img = pred
+
             message = (
                 'hand_normalized',
                 hand_photo_time
