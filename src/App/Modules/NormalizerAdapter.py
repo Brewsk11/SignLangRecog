@@ -1,4 +1,5 @@
 import time
+import queue
 from multiprocessing import Queue, Process
 
 import keras
@@ -14,13 +15,16 @@ class NormalizerAdapter:
         self._master_queue: Queue = settings['master_queue']
         self.model_path = settings['normalizer_settings']['model_path']
 
-        self._prediction_queue = Queue()
+        self._prediction_queue = Queue(maxsize=3)
 
         normalizer_process = Process(target=self.normalizer_worker)
         normalizer_process.start()
 
     def normalize(self, hand_photo: PILImage):
-        self._prediction_queue.put(hand_photo)
+        try:
+            self._prediction_queue.put(hand_photo, block=False)
+        except queue.Full:
+            pass
 
     def normalizer_worker(self):
 

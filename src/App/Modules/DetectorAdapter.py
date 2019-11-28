@@ -65,6 +65,7 @@ class DetectorAdapter:
         self.settings: dict = settings
 
         self._message_queue: multiprocessing.Queue = settings['master_queue']
+        self._video_feed_queue: multiprocessing.Queue = settings['video_feed_queue']
 
         args = {"width": width, "height": height, "num_workers": num_workers, "fps": fps, "queue_size": queue_size,
                 "video_source": video_source, "num_hands": num_hands}
@@ -105,9 +106,9 @@ class DetectorAdapter:
         self.blank_image = np.zeros(shape=[512, 512, 3], dtype=np.uint8)
         self.stopped = False
         self.except_table = []
-        Thread(target=self.update, args=(self._message_queue,)).start()
+        Thread(target=self.update, args=(self._message_queue, self._video_feed_queue)).start()
 
-    def update(self, queue: multiprocessing.Queue):
+    def update(self, queue: multiprocessing.Queue, video_queue: multiprocessing.Queue):
         queue.put(("detector_ready", None))
         while True:
             if self.stopped:
@@ -130,7 +131,7 @@ class DetectorAdapter:
                     "video_frame",
                     pil_frame
                 )
-                queue.put(message)
+                video_queue.put(message)
             except:
                 self.except_table.append("Queue excpetion")
                 output_frame = self.blank_image
