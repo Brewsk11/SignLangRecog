@@ -67,8 +67,15 @@ class MainWindow(tk.Tk):
         prediction_info_f = init_frame(parent=information_frame, height=units(9), width=units(6),
                                        row=1, column=2, rowspan=2)
 
+        xlabels = [str(i*10) + '%' for i in range(11)]
+        ylabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                  'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         f = Figure(figsize=(2, 3), dpi=72)
         self.prediction_info_axe = f.add_subplot(111)
+        self.prediction_info_axe.set_xticks(np.arange(len(xlabels)))
+        self.prediction_info_axe.set_xticklabels(xlabels)
+        self.prediction_info_axe.set_yticks(np.arange(len(ylabels)+1))
+        self.prediction_info_axe.set_yticklabels(ylabels)
         self.prediction_info = FigureCanvasTkAgg(f, master=prediction_info_f)
         self.prediction_info.get_tk_widget().pack(expand=True, fill='both')
 
@@ -145,6 +152,7 @@ class MainWindow(tk.Tk):
 
         index = np.arange(len(labels))
         self.prediction_info_axe.barh(index, pred_list)
+        
 
         # call the draw method on your canvas
         self.prediction_info.draw()
