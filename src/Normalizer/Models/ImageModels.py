@@ -1,7 +1,6 @@
 from PIL.Image import Image as PILImage, open as PILOpen, BICUBIC, BILINEAR, LANCZOS, NEAREST
 from os.path import abspath
 import re as regex
-import platform
 
 
 class ImageAbstr:
@@ -37,17 +36,11 @@ class ImageAbstr:
         # Set fullpath as path + filename
         self._full_path = filepath
 
-        if(platform.system() is 'Linux'):
-            # Set path and filename separately
-            var = filepath.rsplit('/', 1)
-            self._path = str(var[0])
-            self._filename = str(var[1])
-            var = self._filename
-        elif(platform.system() is 'Windows'):
-            var = filepath.rsplit('\\', 1)
-            self._path = str(var[0])
-            self._filename = str(var[1])
-            var = self._filename
+        # Set path and filename separately
+        var = filepath.rsplit('/', 1)
+        self._path = str(var[0])
+        self._filename = str(var[1])
+        var = self._filename
 
         # Find out if the filename if compliant with tagged or training image naming conventions
         if regex.match(filename_pattern, self._filename) is None:
@@ -163,3 +156,4 @@ class TrainingImage(ImageAbstr):
     def __init__(self, filepath: str):
         self._filename_pattern = "^[A-Zdns][0-9]{1,6}\.(bmp|jpg)$"
         super().__init__(filepath, self._filename_pattern)
+

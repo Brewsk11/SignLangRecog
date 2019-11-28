@@ -52,7 +52,6 @@ class TensorBuilder:
 
         return self
 
-
     def __list_to_tensor(self, img_list: list, tensor_size: tuple, grayscale: bool) -> ndarray:
         """
         Function converting a list of TrainingImage or TaggedImage to a tensor as a numpy.ndarray object
@@ -133,7 +132,6 @@ class TensorBuilder:
 
         return out
 
-
     def type(self, new_type: str) -> 'TensorBuilder':
         """
         Changes tensor type as in ndarray specification
@@ -203,3 +201,4 @@ class TensorBuilder:
     def length(self) -> int:
         """Numbers of samples in the provided image list"""
         return self._length
+

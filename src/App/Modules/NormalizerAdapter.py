@@ -6,6 +6,8 @@ import keras
 import numpy as np
 from PIL.Image import Image as PILImage
 
+import time
+
 import matplotlib.pyplot as plt
 
 class NormalizerAdapter:
@@ -30,10 +32,13 @@ class NormalizerAdapter:
 
         model: keras.Model = keras.models.load_model(self.model_path)
 
-        self._master_queue.put(('normalizer_ready', None))
+        end = time.time()
+        self._master_queue.put(('normalizer_ready', end))
 
         while True:
-            hand_photo = self._prediction_queue.get(block=True)
+            hand_photo_time = self._prediction_queue.get(block=True)
+            hand_photo_time.normalizer_start_time = time.time()
+            hand_photo = hand_photo_time.img
 
             tsr_img = self.image_to_tensor(hand_photo)
             tsr_arr: np.ndarray = tsr_img.reshape((1, self.tensor_size[0], self.tensor_size[1], 1))
@@ -47,9 +52,11 @@ class NormalizerAdapter:
             pred = pred.reshape((128, 128))
             pred /= pred.max()
 
+            hand_photo_time.img = pred
+            hand_photo_time.normalizer_end_time = time.time()
             message = (
                 'hand_normalized',
-                pred
+                hand_photo_time
             )
 
             self._master_queue.put(message)

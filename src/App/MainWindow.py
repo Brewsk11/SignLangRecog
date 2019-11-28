@@ -19,8 +19,6 @@ class MainWindow(tk.Tk):
 
 
     def init_layout(self):
-        self.winfo_toplevel().title("Sign Language Recognizer")
-
         unit_size = self.settings['gui_settings']['unit_size']
 
         def units(x):
@@ -188,8 +186,5 @@ class MainWindow(tk.Tk):
         self.prediction_info_axe.set_xticklabels(xlabels)
         self.prediction_info_axe.set_yticks(np.arange(len(ylabels)))
         self.prediction_info_axe.set_yticklabels(ylabels, fontsize='8')
-
-
-
 
 

@@ -14,6 +14,19 @@ from PIL.Image import open as PILOpen
 from App.Modules.Detector.utils import detector_utils as detector_utils
 from App.Modules.Detector.utils.detector_utils import WebcamVideoStream
 
+import time
+
+class TimeFrame:
+    def __init__(self, img, timestamp):
+        self.img = img
+        self.timestamp = timestamp
+        self.detector_time = None
+        self.normalizer_end_time = None
+        self.normalizer_start_time = None
+        self.classifier_end_time = None
+        self.classifier_start_time = None
+
+
 
 def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
     print(">> loading frozen model for worker")
@@ -28,7 +41,8 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
         box_image = None
         # print("> ===== in worker loop, frame ", frame_processed)
         try: 
-            frame = input_q.get()
+            frame_time = input_q.get()
+            frame = frame_time.img
             if frame is not None:
                 # Actual detection. Variable boxes contains the bounding box cordinates for hands detected,
                 # while scores contains the confidence for each of these boxes.
@@ -44,12 +58,13 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
                 # add frame annotated with bounding box to queue
                 output_q.put(frame)
                 frame_processed += 1
+                box_time = TimeFrame(box_image, frame_time.timestamp)
 
             else:
                 output_q.put(frame)
 
             if box_image is not None and box_image.size != 0:
-                box_q.put(box_image)
+                box_q.put(box_time)
             # else:
             #     box_q.put(blank_image)
         except:
@@ -60,7 +75,7 @@ def co_worker(input_q, output_q, box_q, cap_params, frame_processed):
 
 class DetectorAdapter:
 
-    def __init__(self, settings, score_thresh=0.5, width=300, height=200, num_workers=2, fps=1, queue_size=5,
+    def __init__(self, settings, score_thresh=0.3, width=300, height=200, num_workers=2, fps=1, queue_size=5,
                  video_source=0, num_hands=1, ):
         self.settings: dict = settings
 
@@ -109,24 +124,25 @@ class DetectorAdapter:
         Thread(target=self.update, args=(self._message_queue, self._video_feed_queue)).start()
 
     def update(self, queue: multiprocessing.Queue, video_queue: multiprocessing.Queue):
-        queue.put(("detector_ready", None))
+        queue.put(("detector_ready", time.time()))
         while True:
             if self.stopped:
                 print("Detector stop")
                 return
             try:
-                frame = self.video_capture.read()
-                frame = cv2.flip(frame, 1)
+                frame = TimeFrame(self.video_capture.read(), time.time())
+                frame.img = cv2.flip(frame.img, 1)
                 self.index += 1
             except:
                 self.except_table.append("video read exception")
                 frame = self.blank_image
 
             try:
-                self.input_q.put(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                frame.img = cv2.cvtColor(frame.img, cv2.COLOR_BGR2RGB)
+                self.input_q.put(frame)
                 output_frame = self.output_q.get()
 
-                pil_frame = Image.fromarray(output_frame)
+                pil_frame = Image.fromarray(output_frame.img)
                 message = (
                     "video_frame",
                     pil_frame
@@ -138,7 +154,10 @@ class DetectorAdapter:
 
             try:
                 self.box_image = self.box_q.get(False)
-                pil_hand = Image.fromarray(self.box_image)
+                # pil_hand = cv2.cvtColor(self.box_image, cv2.COLOR_RGB2BGR)
+                self.box_image.img = Image.fromarray(self.box_image.img)
+                pil_hand = self.box_image
+                pil_hand.detector_time = time.time()
 
                 message = (
                     "hand_detected",

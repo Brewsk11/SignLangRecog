@@ -27,10 +27,13 @@ class ClassifierAdapter:
 
     def classifier_worker(self):
         model: keras.Model = keras.models.load_model(self.model_path)
-        self._master_queue.put(('classifier_ready', None))
-
+        end = time.time()
+        self._master_queue.put(('classifier_ready', end))
         while True:
-            input_tensor = self._prediction_queue.get()
+
+            input_tensor_time = self._prediction_queue.get()
+            input_tensor_time.classifier_start_time = time.time()
+            input_tensor = input_tensor_time.img
             if input_tensor.shape != self.correct_shape:
                 raise RuntimeError("Wrong tensor shape!")
 
@@ -38,9 +41,11 @@ class ClassifierAdapter:
             input_tensor = input_tensor.reshape(1, 128, 128, 1)
             prediction = model.predict(input_tensor)
 
+            input_tensor_time.img = prediction
+            input_tensor_time.classifier_end_time = time.time()
             message = (
                 'sign_classified',
-                prediction
+                input_tensor_time
             )
 
             self._master_queue.put(message)
