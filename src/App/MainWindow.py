@@ -1,22 +1,26 @@
 import tkinter as tk
+
+import matplotlib
 import numpy as np
 from PIL import ImageTk, Image
-import matplotlib
-import matplotlib.pyplot as plt
-matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
+from App.Modules.PredictionParser import PredictionParser
+
+matplotlib.use('TkAgg')
 
 
 class MainWindow(tk.Tk):
 
+    max_predicted_letters = 20
+
     def __init__(self, settings, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.settings = settings
+        self._pred_parser = PredictionParser()
         self.letter_labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
                               'O', 'P', 'Q', 'R', 'S', 'space', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
         self.init_layout()
-
 
     def init_layout(self):
         self.winfo_toplevel().title("Sign Language Recognizer")
@@ -44,27 +48,27 @@ class MainWindow(tk.Tk):
         predicted_text_f = init_frame(parent=information_frame, height=units(2), width=units(28),
                                       row=0, column=0, columnspan=3)
 
-        predicted_text = tk.Label(predicted_text_f, text='')
-        predicted_text.pack(expand=True, fill='both')
-        predicted_text['font'] = ('Ubuntu Mono', '32')
+        self.predicted_text = tk.Label(predicted_text_f, text='')
+        self.predicted_text.pack(expand=True, fill='both')
+        self.predicted_text['font'] = ('Ubuntu Mono', '32')
+        self.predicted_text['text'] = ""
 
         # 2nd row
         video_feed_f = init_frame(parent=information_frame, height=units(9), width=units(16),
-                                       row=1, column=0, rowspan=2)
+                                  row=1, column=0, rowspan=2)
 
         self.video_feed = tk.Label(video_feed_f)
         self.video_feed.pack(expand=True, fill='both')
-        
 
         hand_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
-                                      row=1, column=1)
+                                 row=1, column=1)
 
         self.hand_view = tk.Label(hand_view_f)
         self.hand_view['background'] = 'red'
         self.hand_view.pack(expand=True, fill='both')
 
         normalized_view_f = init_frame(parent=information_frame, height=units(4), width=units(4),
-                                            row=2, column=1)
+                                       row=2, column=1)
 
         self.normalized_view = tk.Label(normalized_view_f)
         self.normalized_view['background'] = 'blue'
@@ -154,6 +158,16 @@ class MainWindow(tk.Tk):
         # call the draw method on your canvas
         self.prediction_info.draw()
 
+        # Parse the letter and append the result to the gui frame
+        parsed_letter = self._pred_parser.put_and_predict(classified_letter)
+
+        if parsed_letter == "space":
+            parsed_letter = " "
+
+        self.predicted_text['text'] += parsed_letter
+        if len(self.predicted_text['text']) >= self.max_predicted_letters:
+            self.predicted_text['text'] = self.predicted_text['text'][1:]
+
     def set_status(self, module_status):
         status_str = ""
 
@@ -173,7 +187,7 @@ class MainWindow(tk.Tk):
         self.app_info['text'] = status_str
 
     def setup_pred_axes(self, *args):
-        xlabels = [str(i*10) + '%' for i in range(0, 11, 2)]
+        xlabels = [str(i * 10) + '%' for i in range(0, 11, 2)]
         ylabels = self.letter_labels
         for i in range(1, 5):
             self.prediction_info_axe.axvline(x=i, ymin=0, ymax=1, color='whitesmoke', alpha=0.3)
@@ -188,8 +202,3 @@ class MainWindow(tk.Tk):
         self.prediction_info_axe.set_xticklabels(xlabels)
         self.prediction_info_axe.set_yticks(np.arange(len(ylabels)))
         self.prediction_info_axe.set_yticklabels(ylabels, fontsize='8')
-
-
-
-
-

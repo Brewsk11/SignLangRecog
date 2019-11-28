@@ -54,7 +54,7 @@ if __name__ == "__main__":
         while not task_queue.empty():
 
             message, payload = task_queue.get(block=False)
-            print("Oh, got a message!: " + message)
+            # print("Oh, got a message!: " + message)
 
             if module_ready['system']:
                 if message == "hand_detected":
