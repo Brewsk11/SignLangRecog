@@ -145,7 +145,6 @@ class MainWindow(tk.Tk):
     def on_letter_classified(self, pred_list: np.ndarray):
         pred_list = pred_list.flatten()
         classified_letter = self.letter_labels[pred_list.argmax()]
-        print("Damn Daniel, I have just predicted the letter: " + classified_letter)
 
         # Drawing
         # call the clear method on your axes
