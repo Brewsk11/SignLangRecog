@@ -10,12 +10,13 @@ from matplotlib.figure import Figure
 
 class MainWindow(tk.Tk):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, settings, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        self.settings = settings
         self.init_layout()
 
     def init_layout(self):
-        unit_size = 48
+        unit_size = self.settings['gui_settings']['unit_size']
 
         def units(x):
             return x * unit_size

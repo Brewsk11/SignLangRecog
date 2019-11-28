@@ -24,7 +24,7 @@ if __name__ == "__main__":
     normalizer = NormalizerAdapter(settings)
     classifier = ClassifierAdapter(settings)
 
-    app = MainWindow()
+    app = MainWindow(settings=settings)
 
     module_ready = {
         'detector': False,
