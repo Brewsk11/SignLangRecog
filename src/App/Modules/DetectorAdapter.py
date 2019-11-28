@@ -204,7 +204,7 @@ class DetectorAdapterMockup(DetectorAdapter):
 
     def __init__(self, settings):
         super().__init__(settings)
-        self.mock_images_path = self.settings['mock_images_path']
+        self.mock_images_path = self.settings['detector_settings']['mock_images_path']
 
         # Load all images from mock images path to be displayed
         img_name_list = listdir(self.mock_images_path)
