@@ -153,6 +153,20 @@ class MainWindow(tk.Tk):
         # call the draw method on your canvas
         self.prediction_info.draw()
 
-    def set_status(self, status):
+    def set_status(self, module_status):
+        status_str = ""
 
-        pass
+        if not module_status['detector']:
+            status_str += "Detector initializing... "
+
+        if not module_status['normalizer']:
+            status_str += "Normalizer initializing... "
+
+        if not module_status['classifier']:
+            status_str += "Classifier initializing... "
+
+        if module_status['system']:
+            status_str = "System ready."
+            self.app_info['fg'] = 'darkgreen'
+
+        self.app_info['text'] = status_str

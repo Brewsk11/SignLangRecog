@@ -37,6 +37,8 @@ if __name__ == "__main__":
         app.update_idletasks()
         app.update()
 
+        app.set_status(module_ready)
+
         while not task_queue.empty():
 
             message, payload = task_queue.get(block=False)
@@ -72,3 +74,5 @@ if __name__ == "__main__":
                     print('System ready!')
                 else:
                     module_ready['system'] = False
+
+                app.set_status(module_ready)
