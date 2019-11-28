@@ -83,6 +83,10 @@ class MainWindow(tk.Tk):
         application_info_f = init_frame(parent=information_frame, height=units(2), width=units(28),
                                         row=3, column=0, columnspan=3)
 
+        self.app_info = tk.Label(application_info_f)
+        self.app_info['text'] = "Initializing"
+        self.app_info.pack(expand=True, fill='both')
+
     def load_new_frame(self, frame):
         # TODO: Mateusz
         # Wczytanie klatki do VIDEO FEED
@@ -156,3 +160,21 @@ class MainWindow(tk.Tk):
 
         # call the draw method on your canvas
         self.prediction_info.draw()
+
+    def set_status(self, module_status):
+        status_str = ""
+
+        if not module_status['detector']:
+            status_str += "Detector initializing... "
+
+        if not module_status['normalizer']:
+            status_str += "Normalizer initializing... "
+
+        if not module_status['classifier']:
+            status_str += "Classifier initializing... "
+
+        if module_status['system']:
+            status_str = "System ready."
+            self.app_info['fg'] = 'darkgreen'
+
+        self.app_info['text'] = status_str

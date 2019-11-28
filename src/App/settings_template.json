@@ -1,6 +1,7 @@
 {
   "detector_settings": {
-    "model_path": ""
+    "model_path": "",
+    "mock_images_path": ""
   },
   "normalizer_settings": {
     "model_path": ""
@@ -8,5 +9,7 @@
   "classifier_settings": {
     "model_path": ""
   },
-  "mock_images_path": ""
+  "gui_settings": {
+    "unit_size": 36
+  },
 }
