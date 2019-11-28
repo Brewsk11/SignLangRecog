@@ -1,8 +1,8 @@
 from pickle import dump
 
-from Normalizer.Providers.DirectoryImageProvider import DirectoryImageProvider
-from Normalizer.Models.TensorBuilder import TensorBuilder
-from Normalizer.Models.ImageModels import TrainingImage, TaggedImage
+from Common import DirectoryImageProvider
+from Common.Models.TensorBuilder import TensorBuilder
+from Common.Models.ImageModels import TrainingImage, TaggedImage
 
 
 training_data_dir = '/home/pawel/PracaInzynierska/TrainingData_NewBG'

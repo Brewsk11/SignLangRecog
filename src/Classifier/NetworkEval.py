@@ -1,14 +1,9 @@
-from pickle import dump, load
+from pickle import load
 import matplotlib.pyplot as plt
-import tensorflow as tf
 import keras
 import numpy as np
-import pandas as pd
-import seaborn as sns
 from sklearn.metrics import confusion_matrix
 import itertools
-
-from sklearn.utils.multiclass import unique_labels
 
 tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
 models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
@@ -64,7 +59,7 @@ if __name__ == "__main__":
     with open(f'{models_dir}{model_file}', 'rb') as model_file:
         model = keras.models.load_model(model_path)
 
-    '''
+
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
     plt.xlabel('epoch')
@@ -76,7 +71,7 @@ if __name__ == "__main__":
     plt.xlabel('epoch')
     plt.ylabel('loss')
     plt.show()
-    '''
+
     with open(tensors_dir + 'test_images.tsr', 'rb') as images_file:
         test_images = load(images_file)
 
@@ -97,8 +92,6 @@ if __name__ == "__main__":
 
     cm = confusion_matrix(test_letters, predicted_letters, labels=np.arange(len(classes)))
     plot_confusion_matrix(cm, classes, title="Confusion matrix")
-
-    print("Trt")
 
 
 
