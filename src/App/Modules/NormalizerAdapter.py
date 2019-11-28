@@ -15,7 +15,7 @@ class NormalizerAdapter:
         self._master_queue: Queue = settings['master_queue']
         self.model_path = settings['normalizer_settings']['model_path']
 
-        self._prediction_queue = Queue(maxsize=3)
+        self._prediction_queue = Queue(maxsize=1)
 
         normalizer_process = Process(target=self.normalizer_worker)
         normalizer_process.start()
@@ -42,14 +42,9 @@ class NormalizerAdapter:
             tsr_arr -= tsr_arr.min()
             tsr_arr /= tsr_arr.max()
 
-            t0 = time.clock()
             pred = model.predict(tsr_arr)
-            t1 = time.clock()
-            elapsed = t1 - t0
-            print(f"Prediction complete in {elapsed}")
-
+            
             pred = pred.reshape((128, 128))
-
             pred /= pred.max()
 
             message = (
