@@ -1,10 +1,10 @@
-from App.MainWindow import MainWindow
+from MainWindow import MainWindow
 from multiprocessing import Queue
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
-from App.Modules.NormalizerAdapter import NormalizerAdapter
-from App.Modules.DetectorAdapter import DetectorAdapter
-from App.Modules.ClassifierAdapter import ClassifierAdapter
+from Modules.NormalizerAdapter import NormalizerAdapter
+from Modules.DetectorAdapter import DetectorAdapter
+from Modules.ClassifierAdapter import ClassifierAdapter
 import json
 
 settings_path = './settings.json'

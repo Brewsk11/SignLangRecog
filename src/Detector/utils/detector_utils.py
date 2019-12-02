@@ -52,19 +52,73 @@ def load_inference_graph():
 # You can modify this to also draw a label.
 def draw_box_on_image(num_hands_detect, score_thresh, scores, boxes, im_width, im_height, image_np):
     for i in range(num_hands_detect):
-        if (scores[i] > score_thresh):
+        if scores[i] > score_thresh:
             box_width = 1
             (left, right, top, bottom) = (int(boxes[i][1] * im_width), int(boxes[i][3] * im_width),
                                           int(boxes[i][0] * im_height), int(boxes[i][2] * im_height))
+            im_width = int(im_width)
+            im_height - int(im_height)
+            width = right - left
+            height = bottom - top
+            difference = abs(width - height)
+            shift = int(difference/2)
+
+            width = right - left
+            height = bottom - top
+
+            if width > height:
+                if difference % 2 == 1:
+                    top -= shift + 1
+                else:
+                    top -= shift
+                bottom += shift
+            elif width < height:
+                if difference % 2 == 1:
+                    left -= shift + 1
+                else:
+                    left -= shift
+                right += shift
+
+            padding_percent = 0.1
+            padding = int((right - left) * padding_percent)
+
+            top -= padding
+            right += padding
+            bottom += padding
+            left -= padding
+
+            if top < 0:
+                under_zero = abs(top)
+                bottom += under_zero
+                top = 0
+
+            if left < 0:
+                under_zero = abs(left)
+                right += under_zero
+                left = 0
+
+            if bottom > im_height:
+                over = int(bottom - im_height) + 1
+                bottom = int(im_height - 1)
+                top -= over
+                if top < 0:
+                    under_zero = abs(top)
+                    top = 0
+                    left += under_zero
+
+            if right > im_width:
+                over = int(right - im_width) + 1
+                left -= over
+                right = int(im_width - 1)
+                if left < 0:
+                    under_zero = abs(left)
+                    left = 0
+                    bottom -= under_zero
+
+            box_img = image_np.copy()[top:bottom, left:right]
+            # print(str(bottom-top) + "x" + str(right - left))
             p1 = (left, top)
             p2 = (right, bottom)
-            width_padding_percent = 0.3
-            height_padding_percent = 0.3
-            width_padding = int((right - left) * width_padding_percent)
-            height_padding = int((bottom - top) * height_padding_percent)
-            box_img = image_np.copy()[abs(height_padding - top):abs(bottom + height_padding), abs(width_padding - left):abs(right + width_padding)]
-            # print(str(abs(height_padding - top))+":"+str(abs(bottom + height_padding))+","+str(abs(width_padding - left))+":"+str(abs(right + width_padding)))
-            # box_img = image_np.copy()[top:bottom, left:right]
             cv2.rectangle(image_np, p1, p2, (77, 255, 9), box_width, 1)
             return box_img
 

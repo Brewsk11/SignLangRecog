@@ -11,8 +11,8 @@ import tensorflow as tf
 from PIL import Image
 from PIL.Image import open as PILOpen
 
-from App.Modules.Detector.utils import detector_utils as detector_utils
-from App.Modules.Detector.utils.detector_utils import WebcamVideoStream
+from Modules.Detector.utils import detector_utils as detector_utils
+from Modules.Detector.utils.detector_utils import WebcamVideoStream
 
 
 def co_worker(input_q, output_q, box_q, cap_params, frame_processed):

@@ -5,7 +5,7 @@ import numpy as np
 from PIL import ImageTk, Image
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
-from App.Modules.PredictionParser import PredictionParser
+from Modules.PredictionParser import PredictionParser
 
 matplotlib.use('TkAgg')
 
