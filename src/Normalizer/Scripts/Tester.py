@@ -2,9 +2,9 @@ import keras
 import matplotlib.pyplot as plt
 from pickle import load as pickle_load
 
-from Normalizer.Providers.DirectoryImageProvider import DirectoryImageProvider
-from Normalizer.Models.TensorBuilder import TensorBuilder
-from Normalizer.Models.ImageModels import TrainingImage, TaggedImage
+from Common import DirectoryImageProvider
+from Common.Models.TensorBuilder import TensorBuilder
+from Common.Models.ImageModels import TrainingImage
 
 resources_dir = '/home/pawel/PracaInzynierska/Normalizer'
 

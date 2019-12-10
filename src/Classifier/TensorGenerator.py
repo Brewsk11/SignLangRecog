@@ -1,25 +1,25 @@
 from pickle import dump, load
 import numpy
 from random import shuffle
-
-from Classifier.Providers.DirectoryImageProvider import DirectoryImageProvider
-from Classifier.Models.TensorBuilder import TensorBuilder
-from Classifier.Models.ImageModels import TaggedImage
+from Common.DirectoryImageProvider import DirectoryImageProvider
+from Common.Models.TensorBuilder import TensorBuilder
+from Common.Models.ImageModels import TaggedImage
 from Classifier.Models.LettersTensorBuilder import LettersTensorBuilder
 
-#if true generate new part tensors, if false connect tensors
-generate_new_or_connect = False
+generate_new_or_connect = True
 res = 128
 seed = 69
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
-tagged_data_dir = 'LiterkiTrain1'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/Refactor/'
+tagged_data_dir = 'LiterkiTest'
 tagged_data_dir2 = 'LiterkiTrain2'
 tagged_data_path = 'C:/Users/jakub/Desktop/Inzynierka/' + tagged_data_dir + '/'
 tagged_data_path2 = 'C:/Users/jakub/Desktop/Inzynierka/' + tagged_data_dir2 + '/'
 
+# if flag 'generate_new_or_connect' is set to False, the script connects two pairs of tensors instead of generating a new pair
+# this was needed due to Windows throwing error in case of generating tensors from too many images at the same time
 if __name__ == "__main__":
-    if(generate_new_or_connect):
+    if generate_new_or_connect:
         #generate first pair of tensors
         images_tensor_path = tensors_dir + tagged_data_dir + '_images.tsr'
         letters_tensor_path = tensors_dir + tagged_data_dir + '_letters.tsr'
@@ -79,9 +79,6 @@ if __name__ == "__main__":
         letters_tensor1._length = letters_tensor1._length + letters_tensor2._length
         letters_tensor1._img_list.extend(letters_tensor2._img_list)
 
-        print(images_tensor1._img_list[10000].letter)
-        print(letters_tensor1._img_list[10000].letter)
-
         #shuffle connected tensors
         print("Shuffle connected tensors")
         shuffled_list1 = []
@@ -95,8 +92,10 @@ if __name__ == "__main__":
         images_tensor1._img_list = shuffled_list1
         letters_tensor1._img_list = shuffled_list2
 
-        shuffled_list1 = numpy.zeros(shape=(13520, 128, 128, 1))
-        shuffled_list2 = numpy.zeros(shape=(13520, 27))
+        length = letters_tensor1._length
+
+        shuffled_list1 = numpy.zeros(shape=(length, 128, 128, 1))
+        shuffled_list2 = numpy.zeros(shape=(length, 27))
         j = 0
         for i in index_shuf:
             shuffled_list1[j] = images_tensor1._tensor[i]

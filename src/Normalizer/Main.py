@@ -7,11 +7,10 @@ from hashlib import md5
 from time import time
 from os.path import isfile
 
-from Normalizer.Providers.DirectoryImageProvider import DirectoryImageProvider
-from Normalizer.Models.TensorBuilder import TensorBuilder
-from Normalizer.Models.ImageModels import TrainingImage, TaggedImage
-from Normalizer.Models.NetworkModels import UNetModel, SimpleDenseModel
-
+from Common import DirectoryImageProvider
+from Common.Models.TensorBuilder import TensorBuilder
+from Common.Models.ImageModels import TrainingImage, TaggedImage
+from Normalizer.Models.NetworkModels import UNetModel
 
 # You should use pickle to dump the loaded tensor as the preparation takes a long time.
 # However for the first time or if you change data you can reload images using the flag below.

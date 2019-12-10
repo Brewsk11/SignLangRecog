@@ -6,10 +6,9 @@ from os.path import isfile
 import keras
 from keras.optimizers import *
 from keras.callbacks import *
-import matplotlib.pyplot as plt
 
-tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/'
-models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/'
+tensors_dir = 'C:/Users/jakub/Desktop/Inzynierka/Tensors/Refactor/'
+models_dir = 'C:/Users/jakub/Desktop/Inzynierka/Models/Refactor/'
 images_tensor_name = 'train_images.tsr'
 letters_tensor_name = 'train_letters.tsr'
 res = 128
@@ -47,17 +46,7 @@ if __name__ == "__main__":
         print(f'Letter: {images_tensor._img_list[x]._letter}, tensor: {letters_tensor._tensor[x]}')
 
 
-    #displaying img
-    display_images = train_images
-    display_images = display_images.reshape((len(display_images), 128, 128))
-    plt.imshow(display_images[0])
-    #plt.show()
-    plt.imshow(display_images[1])
-    #plt.show()
-
-
-    # 3: -- Train the network --
-
+    #Train
     model_hash = md5(str(time()).encode('ascii')).hexdigest()[:5]
 
     model = model_class().build_model((res, res, 1))
@@ -70,7 +59,7 @@ if __name__ == "__main__":
 
     epochs_num = 40
     batch_size = 16
-    save_every_n_epoch = 4  # How often the fit function will save the model to the models directory
+    save_every_n_epoch = 4
 
     history = model.fit(
                     x=train_images,

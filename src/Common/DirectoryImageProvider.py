@@ -3,7 +3,7 @@ from os import listdir
 from os.path import abspath, isdir
 from typing import Union, Optional
 
-from Classifier.Models.ImageModels import TaggedImage, TrainingImage
+from Common.Models.ImageModels import TaggedImage, TrainingImage
 
 
 class DirectoryImageProvider:
@@ -14,12 +14,10 @@ class DirectoryImageProvider:
     _path: str
     _img_type: Union[TaggedImage, TrainingImage]
     _img_list: Optional[list]
-    _resolution: int
 
-    def __init__(self, path: str, img_type: Union[TaggedImage, TrainingImage], resolution: int, recursive: bool = True):
+    def __init__(self, path: str, img_type: Union[TaggedImage, TrainingImage], recursive: bool = True):
         self._path = path
         self._img_type = img_type
-        self._resolution = resolution
 
         # Recursively add images from the directory
         self._img_list = self.__load_img_list(self.path, recursive)
@@ -52,7 +50,7 @@ class DirectoryImageProvider:
                 img_list += lower_dir_imgs
                 continue
 
-            img = self._img_type(abs_path, self._resolution)
+            img = self._img_type(abs_path)
             img_list.append(img)
 
         img_list.sort(key=lambda im: (im.letter, im.number))

@@ -1,13 +1,11 @@
-from image_fetcher.multithread_image_fetching import concurrent_image_search, concurrent_images_download
-from image_fetcher.browsers import Browser, BrowserType
 from PIL import Image
 from PIL.ImageColor import getrgb
 from random import randint
 from os import listdir, mkdir
-from os.path import isdir, isfile
+from os.path import isdir
 
-from Normalizer.Providers.DirectoryImageProvider import  DirectoryImageProvider as ImgProvider
-from Normalizer.Models.ImageModels import TrainingImage, TaggedImage
+from Common import DirectoryImageProvider as ImgProvider
+from Common.Models.ImageModels import TrainingImage, TaggedImage
 
 
 def cutout_black(img: Image.Image):
